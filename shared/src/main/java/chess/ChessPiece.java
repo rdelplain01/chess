@@ -1,6 +1,7 @@
 package chess;
 
-import java.util.ArrayList;
+import chess.movecalc.BishopMoveCalc;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -58,46 +59,34 @@ public class ChessPiece {
 
         // Bishop Logic
         if (piece.getPieceType() == PieceType.BISHOP) {
-            // do stuff
-            int row = myPosition.getRow();
-            int col = myPosition.getColumn();
-            List<ChessMove> moves = new ArrayList<>();
-
-            while (row != 1 && col != 1) {
-                row--;
-                col--;
-                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row != 8 && col != 8) {
-                row++;
-                col++;
-                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row != 8 && col != 1) {
-                row++;
-                col--;
-                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row != 1 && col != 8) {
-                row--;
-                col++;
-                moves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()), new ChessPosition(row, col), null));
-            }
-
-            return moves;
+            return new BishopMoveCalc().calculate(myPosition);
         }
+
+        // King Logic
+        if (piece.getPieceType() == PieceType.KING) {
+            return null;
+        }
+
+        // Knight Logic
+        if (piece.getPieceType() == PieceType.KNIGHT) {
+            return null;
+        }
+
+        // Queen Logic
+        if (piece.getPieceType() == PieceType.QUEEN) {
+            return null;
+        }
+
+        // Rook Logic
+        if (piece.getPieceType() == PieceType.ROOK) {
+            return null;
+        }
+
+        // Pawn Logic
+        if (piece.getPieceType() == PieceType.PAWN) {
+            return null;
+        }
+
         return List.of();
     }
 }
