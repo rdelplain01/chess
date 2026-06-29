@@ -3,7 +3,6 @@ package chess.movecalc;
 import chess.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class BishopMoveCalc {

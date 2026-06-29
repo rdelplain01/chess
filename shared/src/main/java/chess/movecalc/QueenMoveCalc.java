@@ -1,5 +1,7 @@
 package chess.movecalc;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 
@@ -10,9 +12,9 @@ import java.util.List;
 public class QueenMoveCalc {
     public QueenMoveCalc() {}
 
-    public Collection<ChessMove> calculate(ChessPosition myPosition) {
+    public Collection<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor) {
         Collection<ChessMove> rookMoves = new RookMoveCalc().calculate(myPosition);
-        Collection<ChessMove> bishopMoves = new BishopMoveCalc().calculate(myPosition);
+        Collection<ChessMove> bishopMoves = new BishopMoveCalc().calculate(myPosition, board, pieceColor);
 
         List<ChessMove> moves = new ArrayList<>(rookMoves);
         moves.addAll(bishopMoves);
