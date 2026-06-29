@@ -3,6 +3,7 @@ package chess;
 import chess.movecalc.BishopMoveCalc;
 import chess.movecalc.KingMoveCalc;
 import chess.movecalc.KnightMoveCalc;
+import chess.movecalc.RookMoveCalc;
 
 import java.util.Collection;
 import java.util.List;
@@ -81,7 +82,7 @@ public class ChessPiece {
 
         // Rook Logic
         if (piece.getPieceType() == PieceType.ROOK) {
-            return null;
+            return new RookMoveCalc().calculate(myPosition);
         }
 
         // Pawn Logic
