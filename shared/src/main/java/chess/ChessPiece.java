@@ -1,9 +1,6 @@
 package chess;
 
-import chess.movecalc.BishopMoveCalc;
-import chess.movecalc.KingMoveCalc;
-import chess.movecalc.KnightMoveCalc;
-import chess.movecalc.RookMoveCalc;
+import chess.movecalc.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -77,7 +74,7 @@ public class ChessPiece {
 
         // Queen Logic
         if (piece.getPieceType() == PieceType.QUEEN) {
-            return null;
+            return new QueenMoveCalc().calculate(myPosition);
         }
 
         // Rook Logic
