@@ -59,7 +59,7 @@ public class ChessPiece {
 
         // Bishop Logic
         if (piece.getPieceType() == PieceType.BISHOP) {
-            return new BishopMoveCalc().calculate(myPosition);
+            return new BishopMoveCalc().calculate(myPosition, board, pieceColor);
         }
 
         // King Logic
@@ -74,7 +74,7 @@ public class ChessPiece {
 
         // Queen Logic
         if (piece.getPieceType() == PieceType.QUEEN) {
-            return new QueenMoveCalc().calculate(myPosition);
+            return new QueenMoveCalc().calculate(myPosition, board, pieceColor);
         }
 
         // Rook Logic
