@@ -34,6 +34,13 @@ public class ChessPosition {
         return col;
     }
 
+    // Gives true if the move is on the board
+    public boolean moveInbounds(int row, int col) {
+        if (row < 1 || row > 8) { return false; }
+        if (col < 1 || col > 8) { return false; }
+        return true;
+    }
+
     @Override
     public String toString() {
         return String.format("[%d,%d]", row, col);
