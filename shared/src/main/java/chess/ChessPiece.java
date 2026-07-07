@@ -64,7 +64,7 @@ public class ChessPiece {
 
         // King Logic
         if (piece.getPieceType() == PieceType.KING) {
-            return new KingMoveCalc().calculate(myPosition);
+            return new KingMoveCalc().calculate(myPosition, board, pieceColor);
         }
 
         // Knight Logic
