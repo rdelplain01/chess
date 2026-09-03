@@ -1,7 +1,6 @@
 package chess.movecalc;
 
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +9,7 @@ import java.util.List;
 public class KnightMoveCalc {
     public KnightMoveCalc() {}
 
-    public Collection<ChessMove> calculate(ChessPosition myPosition) {
+    public Collection<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor) {
         int[][] moveSet = {
                 { 1, 2},
                 { 1,-2},
@@ -32,13 +31,16 @@ public class KnightMoveCalc {
             if (mutRow < 1 || mutRow > 8 || mutCol < 1 || mutCol > 8) {
                 continue;
             }
-
-            moves.add(new ChessMove(
+            ChessMove move = new ChessMove(
                     new ChessPosition(row, col),
                     new ChessPosition(
                             mutRow,
                             mutCol),
-                    null));
+                    null);
+            ChessPiece endPiece = board.getPiece(move.getEndPosition());
+            if (endPiece == null || endPiece.getTeamColor() != pieceColor) {
+                moves.add(move);
+            }
         }
 
         return moves;
