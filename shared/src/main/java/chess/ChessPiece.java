@@ -84,7 +84,7 @@ public class ChessPiece {
 
         // Pawn Logic
         if (piece.getPieceType() == PieceType.PAWN) {
-            return new PawnMoveCalc().calculate(myPosition, pieceColor);
+            return new PawnMoveCalc().calculate(myPosition, board, pieceColor);
         }
 
         return List.of();
