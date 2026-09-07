@@ -1,7 +1,6 @@
 package chess.movecalc;
 
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +9,7 @@ import java.util.List;
 public class RookMoveCalc {
     public RookMoveCalc() {}
 
-    public Collection<ChessMove> calculate(ChessPosition myPosition) {
+    public Collection<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         List<ChessMove> moves = new ArrayList<>();
@@ -26,9 +25,22 @@ public class RookMoveCalc {
             int mutRow = row;
             int mutCol = col;
 
-            while (!(mutRow <= 1 || mutRow >= 8 || mutCol <= 1 || mutCol >= 8)) {
+            while (myPosition.moveInbounds(mutRow+ints[0], mutCol+ints[1])) {
                 mutRow += ints[0];
                 mutCol += ints[1];
+
+                ChessPiece endPiece = board.getPiece(new ChessPosition(mutRow, mutCol));
+                if (endPiece != null) {
+                    if (!(endPiece.getTeamColor().equals(pieceColor))) {
+                        moves.add(new ChessMove(
+                                new ChessPosition(row, col),
+                                new ChessPosition(
+                                        mutRow,
+                                        mutCol),
+                                null));
+                    }
+                    break;
+                }
 
                 moves.add(new ChessMove(
                         new ChessPosition(row, col),

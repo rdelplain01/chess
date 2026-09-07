@@ -13,7 +13,7 @@ public class QueenMoveCalc {
     public QueenMoveCalc() {}
 
     public Collection<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor) {
-        Collection<ChessMove> rookMoves = new RookMoveCalc().calculate(myPosition);
+        Collection<ChessMove> rookMoves = new RookMoveCalc().calculate(myPosition, board, pieceColor);
         Collection<ChessMove> bishopMoves = new BishopMoveCalc().calculate(myPosition, board, pieceColor);
 
         List<ChessMove> moves = new ArrayList<>(rookMoves);

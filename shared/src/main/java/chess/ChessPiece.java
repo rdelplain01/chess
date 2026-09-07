@@ -79,7 +79,7 @@ public class ChessPiece {
 
         // Rook Logic
         if (piece.getPieceType() == PieceType.ROOK) {
-            return new RookMoveCalc().calculate(myPosition);
+            return new RookMoveCalc().calculate(myPosition, board, pieceColor);
         }
 
         // Pawn Logic
