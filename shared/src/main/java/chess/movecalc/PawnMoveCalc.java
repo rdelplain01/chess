@@ -97,7 +97,8 @@ public class PawnMoveCalc {
         if (pieceColor == ChessGame.TeamColor.BLACK) {
             if (row == 7) {
                 ChessPiece endPiece = board.getPiece(new ChessPosition(row - 2, col));
-                if (endPiece == null) {
+                ChessPiece endPieceTwo = board.getPiece(new ChessPosition(row - 1, col));
+                if (endPiece == null && endPieceTwo == null) {
                     moves.add(new ChessMove(
                             new ChessPosition(row, col),
                             new ChessPosition(row - 2, col),
@@ -140,6 +141,9 @@ public class PawnMoveCalc {
             for (int[] ints : captureSet) {
                 int mutRow = row + ints[0];
                 int mutCol = col + ints[1];
+                if (!(myPosition.moveInbounds(mutRow, mutCol))) {
+                    continue;
+                }
                 if (mutRow == 1) {
                     ChessPiece endPiece = board.getPiece(new ChessPosition(mutRow, mutCol));
                     if (endPiece != null && endPiece.getTeamColor() != ChessGame.TeamColor.BLACK) {
