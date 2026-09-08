@@ -60,6 +60,9 @@ public class PawnMoveCalc {
             for (int[] ints : captureSet) {
                 int mutRow = row + ints[0];
                 int mutCol = col + ints[1];
+                if (!myPosition.moveInbounds(mutRow, mutCol)) {
+                    continue;
+                }
                 if (mutRow == 8) {
                     ChessPiece endPiece = board.getPiece(new ChessPosition(mutRow, mutCol));
                     if (endPiece != null && endPiece.getTeamColor() != ChessGame.TeamColor.WHITE) {
