@@ -3,23 +3,15 @@ package chess.movecalc;
 import chess.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class RookMoveCalc {
-    public RookMoveCalc() {}
+public class InfiniteMoveCalc {
+    public InfiniteMoveCalc() {}
 
-    public Collection<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor) {
+    public List<ChessMove> calculate(ChessPosition myPosition, ChessBoard board, ChessGame.TeamColor pieceColor, int[][] moveSet) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         List<ChessMove> moves = new ArrayList<>();
-
-        int[][] moveSet = {
-                { 1,  0},  // right
-                { 0,  1},  // down
-                {-1,  0},  // left
-                { 0, -1},  // up
-        };
 
         for (int[] ints : moveSet) {
             int mutRow = row;

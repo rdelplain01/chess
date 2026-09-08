@@ -60,7 +60,13 @@ public class ChessPiece {
 
         // Bishop Logic
         if (piece.getPieceType() == PieceType.BISHOP) {
-            return new BishopMoveCalc().calculate(myPosition, board, pieceColor);
+            int[][] moveSet = {
+                    { 1,  1},
+                    { 1, -1},
+                    {-1,  1},
+                    {-1, -1}
+            };
+            return new InfiniteMoveCalc().calculate(myPosition, board, pieceColor, moveSet);
         }
 
         // King Logic
@@ -75,12 +81,28 @@ public class ChessPiece {
 
         // Queen Logic
         if (piece.getPieceType() == PieceType.QUEEN) {
-            return new QueenMoveCalc().calculate(myPosition, board, pieceColor);
+            int[][] moveSet = {
+                    { 1,  0},
+                    { 0,  1},
+                    {-1,  0},
+                    { 0, -1},
+                    { 1,  1},
+                    { 1, -1},
+                    {-1,  1},
+                    {-1, -1}
+            };
+            return new InfiniteMoveCalc().calculate(myPosition, board, pieceColor, moveSet);
         }
 
         // Rook Logic
         if (piece.getPieceType() == PieceType.ROOK) {
-            return new RookMoveCalc().calculate(myPosition, board, pieceColor);
+            int[][] moveSet = {
+                    { 1,  0},  // right
+                    { 0,  1},  // down
+                    {-1,  0},  // left
+                    { 0, -1}   // up
+            };
+            return new InfiniteMoveCalc().calculate(myPosition, board, pieceColor, moveSet);
         }
 
         // Pawn Logic
