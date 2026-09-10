@@ -37,57 +37,47 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
+    public void fenBoard(String fen) {
+        ChessGame.TeamColor color;
+        ChessPiece.PieceType type = ChessPiece.PieceType.PAWN;
+        int i = 8;
+        int j = 1;
+        boolean breakFor = false;
+        for (int g = 0; g < fen.length(); g++) {
+            char place = fen.charAt(g);
+            switch (Character.toUpperCase(place)) {
+                case 'R' -> type = ChessPiece.PieceType.ROOK;
+                case 'N' -> type = ChessPiece.PieceType.KNIGHT;
+                case 'B' -> type = ChessPiece.PieceType.BISHOP;
+                case 'K' -> type = ChessPiece.PieceType.KING;
+                case 'Q' -> type = ChessPiece.PieceType.QUEEN;
+                case 'P' -> type = ChessPiece.PieceType.PAWN;
+                case '/' -> { i--; j=1; continue;}
+                case ' ' -> breakFor = true;
+                default -> {
+                    j += Character.getNumericValue(place);
+                    continue;
+                }
+            }
+            if (breakFor) {
+                break;
+            }
+            if (Character.isUpperCase(place)) {
+                color = ChessGame.TeamColor.WHITE;
+            } else {
+                color = ChessGame.TeamColor.BLACK;
+            }
+            addPiece(new ChessPosition(i,j), new ChessPiece(color, type));
+            j++;
+        }
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        //throw new RuntimeException("Not implemented");
-        for (int i = 1; i < squares.length+1; i++) {
-            for (int j = 1; j < squares[i-1].length+1; j++) {
-                addPiece(new ChessPosition(i,j), null);
-            }
-        }
-
-        // White Back Rank
-        addPiece(new ChessPosition(1,1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(1,2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(1,3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(1,4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(1,5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(1,6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(1,7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(1,8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-
-        // White Pawns
-        addPiece(new ChessPosition(2,1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(2,8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-
-        // Black Pawns
-        addPiece(new ChessPosition(7,1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        addPiece(new ChessPosition(7,8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-
-        // Black Back Rank
-        addPiece(new ChessPosition(8,1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(8,2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(8,3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(8,4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(8,5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(8,6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(8,7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(8,8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+        fenBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
     @Override
@@ -106,14 +96,30 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-
-        for (int i = 1; i < squares.length+1; i++) {
-            for (int j = 1; j < squares[i-1].length+1; j++) {
-                getPiece(new ChessPosition(i,j));
+        StringBuilder board = new StringBuilder();
+        for (int i = 8; i > 0; i--) {
+            board.append('\n');
+            for (int j = 1; j < squares[0].length+1; j++) {
+                if (getPiece(new ChessPosition(i, j)) == null) {
+                    board.append(" ");
+                } else {
+                    Character piece;
+                    switch (getPiece(new ChessPosition(i, j)).getPieceType()) {
+                        case ROOK -> piece = 'R';
+                        case KNIGHT -> piece = 'N';
+                        case BISHOP -> piece = 'B';
+                        case KING -> piece = 'K';
+                        case QUEEN -> piece = 'Q';
+                        default -> piece = 'P';
+                    }
+                    if (getPiece(new ChessPosition(i, j)).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        piece = Character.toLowerCase(piece);
+                    }
+                    board.append(piece);
+                }
+                board.append('|');
             }
         }
-        return "ChessBoard{" +
-                "squares=" + Arrays.toString(squares) +
-                '}';
+        return board.toString();
     }
 }
