@@ -37,6 +37,11 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
+    public void movePiece(ChessMove move, ChessPiece piece) {
+        squares[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn()-1] = null;
+        squares[move.getEndPosition().getRow()-1][move.getEndPosition().getColumn()-1] = piece;
+    }
+
     public void fenBoard(String fen) {
         ChessGame.TeamColor color;
         ChessPiece.PieceType type = ChessPiece.PieceType.PAWN;
