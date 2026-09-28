@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -178,9 +179,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException();
+        }
+        if (piece.getTeamColor() != turn) {
+            throw new InvalidMoveException();
+        }
         Collection<ChessMove> validMovesList = validMoves(move.getStartPosition());
         if (validMovesList.contains(move)) {
-            board.movePiece(move, board.getPiece(move.getStartPosition()));
+            if (move.getPromotionPiece() != null) {
+                board.movePiece(move, new ChessPiece(turn, move.getPromotionPiece()));
+            } else {
+                board.movePiece(move, piece);
+            }
+            if (turn == TeamColor.WHITE) {
+                turn = TeamColor.BLACK;
+            } else {
+                turn = TeamColor.WHITE;
+            }
+        } else {
+            throw new InvalidMoveException();
         }
     }
 
@@ -296,5 +315,19 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return turn == chessGame.turn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(turn, board);
     }
 }
