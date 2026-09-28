@@ -55,14 +55,31 @@ public class ChessGame {
                 if (!(endPiece.getTeamColor().equals(myColor))) {
                     return check;
                 }
+                if (endPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    continue;
+                }
                 return null;
             }
         }
         return null;
     }
 
-    private ArrayList<ChessPosition> pinSet(TeamColor myColor) {
-        ChessPosition myPosition = findKing(myColor);
+    private ArrayList<ChessPosition> finiteMove(int[][] moves, ChessPiece.PieceType pieceType, ChessPosition myPosition, TeamColor myColor) {
+        ArrayList<ChessPosition> moveList = new ArrayList<>();
+        for (var move : moves) {
+            if (!myPosition.moveInbounds(myPosition.getRow()+move[0], myPosition.getColumn()+move[1])) { continue; }
+            var check = board.getPiece(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
+            if (check != null && check.getTeamColor() != myColor) {
+                ChessPiece.PieceType type = check.getPieceType();
+                if (type == pieceType) {
+                    moveList.add(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
+                }
+            }
+        }
+        return moveList;
+    }
+
+    private ArrayList<ChessPosition> pinSet(TeamColor myColor, ChessPosition myPosition) {
         int[][] strait = {
                 { 1,  0},
                 { 0,  1},
@@ -85,13 +102,28 @@ public class ChessGame {
                 {-1,  1},
                 {-1, -1}
         };
+        int[][] king = {
+                { 1,  1},
+                { 1, -1},
+                {-1,  1},
+                {-1, -1},
+                { 1,  0},
+                { 0,  1},
+                {-1,  0},
+                { 0, -1}
+        };
+
+        int[][] pawn = myColor == TeamColor.WHITE
+                ? new int[][] { { 1,  1 }, { 1, -1 } }
+                : new int[][] { { -1, 1 }, { -1, -1 } };
+
 
         ArrayList<ChessPosition> moveList = new ArrayList<>();
         for (var move : diagonal) {
             var check = infiniteMoves(move, myPosition, myColor);
             if (check != null) {
                 ChessPiece.PieceType type = board.getPiece(check).getPieceType();
-                if (type == ChessPiece.PieceType.QUEEN || type == ChessPiece.PieceType.BISHOP || type == ChessPiece.PieceType.PAWN || type == ChessPiece.PieceType.KING) {
+                if (type == ChessPiece.PieceType.QUEEN || type == ChessPiece.PieceType.BISHOP) {
                     moveList.add(check);
                 }
             }
@@ -100,21 +132,14 @@ public class ChessGame {
             var check = infiniteMoves(move, myPosition, myColor);
             if (check != null) {
                 ChessPiece.PieceType type = board.getPiece(check).getPieceType();
-                if (type == ChessPiece.PieceType.QUEEN || type == ChessPiece.PieceType.ROOK || type == ChessPiece.PieceType.KING) {
+                if (type == ChessPiece.PieceType.QUEEN || type == ChessPiece.PieceType.ROOK) {
                     moveList.add(check);
                 }
             }
         }
-        for (var move : knight) {
-            if (!myPosition.moveInbounds(myPosition.getRow()+move[0], myPosition.getColumn()+move[1])) { continue; }
-            var check = board.getPiece(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
-            if (check != null && check.getTeamColor() != myColor) {
-                ChessPiece.PieceType type = check.getPieceType();
-                if (type == ChessPiece.PieceType.KNIGHT) {
-                    moveList.add(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
-                }
-            }
-        }
+        moveList.addAll(finiteMove(knight, ChessPiece.PieceType.KNIGHT, myPosition, myColor));
+        moveList.addAll(finiteMove(king, ChessPiece.PieceType.KING, myPosition, myColor));
+        moveList.addAll(finiteMove(pawn, ChessPiece.PieceType.PAWN, myPosition, myColor));
         return moveList;
     }
 
@@ -155,33 +180,14 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ArrayList<ChessPosition> moveList = new ArrayList<>();
-        moveList = pinSet(teamColor);
+        ChessPosition myPosition = findKing(teamColor);
+        ArrayList<ChessPosition> moveList = pinSet(teamColor, myPosition);
         return !moveList.isEmpty();
     }
 
     public boolean isPositionInCheck(TeamColor teamColor, ChessPosition myPosition) {
-        ArrayList<ChessPosition> moveList = new ArrayList<>();
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition check = new ChessPosition(i, j);
-                if (board.getPiece(check) != null) {
-                    if (board.getPiece(check).getTeamColor() != teamColor) {
-                        if (board.getPiece(check).getPieceType() == ChessPiece.PieceType.PAWN) {
-                            int dir = -1;
-                            if (teamColor == TeamColor.BLACK) { dir = 1; }
-                            moveList.add(new ChessPosition(check.getRow()+dir, check.getColumn()+1));
-                            moveList.add(new ChessPosition(check.getRow()+dir, check.getColumn()-1));
-                        } else {
-                            for (var move : board.getPiece(check).pieceMoves(board, check)) {
-                                moveList.add(move.getEndPosition());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return moveList.contains(myPosition);
+        ArrayList<ChessPosition> moveList = pinSet(teamColor, myPosition);
+        return !moveList.isEmpty();
     }
 
     private ChessPosition findKing(TeamColor teamColor) {
