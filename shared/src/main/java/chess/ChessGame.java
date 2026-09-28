@@ -232,7 +232,19 @@ public class ChessGame {
                 return false;
             }
         }
-        return true;
+        ArrayList<ChessMove> validMovesList = new ArrayList<>();
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition check = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(check);
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor) {
+                        validMovesList.addAll(validMoves(check));
+                    }
+                }
+            }
+        }
+        return validMovesList.isEmpty();
     }
 
     /**
