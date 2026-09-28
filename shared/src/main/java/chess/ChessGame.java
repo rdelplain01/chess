@@ -17,6 +17,10 @@ public class ChessGame {
         board.resetBoard();
     }
 
+    public ChessGame(ChessBoard board) {
+        this.board = board;
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -153,11 +157,18 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ArrayList<ChessMove> validMoves = new ArrayList<>();
         TeamColor myColor = board.getPiece(startPosition).getTeamColor();
-        if (isInCheck(myColor)) {
-            throw new RuntimeException("Not implemented");
-        }
+        ChessPiece myPiece = board.getPiece(startPosition);
 
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> myMoves = myPiece.pieceMoves(board, startPosition);
+        for (var move : myMoves) {
+            ChessBoard myBoard = new ChessBoard(board);
+            myBoard.movePiece(move, myPiece);
+            ChessGame myGame = new ChessGame(myBoard);
+            if (!myGame.isInCheck(myColor)) {
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
     }
 
     /**

@@ -16,7 +16,9 @@ public class ChessBoard {
 
     }
      public ChessBoard(ChessBoard board) {
-        this.squares = board.squares;
+         for (int i = 0; i < squares.length; i++) {
+             this.squares[i] = board.squares[i].clone();
+         }
      }
 
     /**
