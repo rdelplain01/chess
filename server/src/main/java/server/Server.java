@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import model.AuthData;
+import model.UserData;
 import services.Services;
 
 import java.util.Map;
@@ -25,11 +27,27 @@ public class Server {
 
 
     private static void register(Context ctx) {
-        System.out.println(ctx.body());
-        Services.getUser("");
-        Services.createUser("");
-        Services.createAuth("");
-        var result = Map.of("username", "", "authToken", "");
+        Map body = new Gson().fromJson(ctx.body(), Map.class);
+        String username = body.get("username").toString();
+        String password = body.get("password").toString();
+        String email = body.get("email").toString();
+
+        // Maybe should be in services
+
+        UserData userData = new UserData(username, password, email);
+
+        if (Services.getUser(username) != null) {
+            // Throw exception
+        }
+        Services.createUser(userData);
+
+        AuthData authData = new AuthData(username);
+
+        Services.createAuth(authData);
+
+        //---
+
+        var result = Map.of("username", username, "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
     }
 
@@ -44,7 +62,7 @@ public class Server {
         // Login
         Services.getUser("");
         Services.verifyPassword("", "");
-        Services.createAuth("");
+        //Services.createAuth("");
     }
 
     private static void logout(Context ctx) {

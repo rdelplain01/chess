@@ -1,8 +1,13 @@
 package services;
 
+import dataaccess.DataAccess;
+import model.AuthData;
+import model.UserData;
+
 public class Services {
     public static void clearUsers() {
         // Clear Users
+        DataAccess.clear();
     }
 
     public static void clearGames() {
@@ -13,16 +18,19 @@ public class Services {
         // Clear Auth
     }
 
-    public static void getUser(String username) {
+    public static UserData getUser(String username) {
         // Get Users
+        return DataAccess.getUser(username);
     }
 
-    public static void createUser(String userData) {
+    public static void createUser(UserData userData) {
         // Create User
+        DataAccess.createUser(userData);
     }
 
-    public static void createAuth(String authData) {
+    public static void createAuth(AuthData authData) {
         // Create Auth
+        DataAccess.createAuth(authData);
     }
 
     public static void verifyPassword(String password, String userData) {
