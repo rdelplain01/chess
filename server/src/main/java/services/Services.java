@@ -6,6 +6,7 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Services {
     public static void clearUsers() {
@@ -61,15 +62,23 @@ public class Services {
         return DataAccess.createGame(gameName);
     }
 
-    public static void getGame(String gameID) {
+    public static GameData getGame(int gameID) {
         // Do stuff
+        return DataAccess.getGame(gameID);
     }
 
-    public static void checkColor(String playerColor) {
+    public static boolean checkColor(String playerColor, GameData gameData) {
         // Do stuff
+        if (Objects.equals(playerColor, "WHITE")) {
+            return gameData.getWhiteUsername() != null;
+        } else if(Objects.equals(playerColor, "BLACK")) {
+            return gameData.getBlackUsername() != null;
+        }
+        return false;
     }
 
-    public static void updateGame(String gameData) {
+    public static void updateGame(GameData gameData) {
         // Do stuff
+        DataAccess.updateGame(gameData);
     }
 }

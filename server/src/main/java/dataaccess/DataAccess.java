@@ -42,8 +42,9 @@ public class DataAccess {
         return game.getGameID();
     }
 
-    public static void getGame() {
+    public static GameData getGame(int gameID) {
         // get Game
+        return gameDataList.get(gameID - 1);
     }
 
     public static ArrayList<GameData> listGames() {
@@ -51,8 +52,9 @@ public class DataAccess {
         return gameDataList;
     }
 
-    public static void updateGame() {
+    public static void updateGame(GameData gameData) {
         // update Game
+        gameDataList.set(gameData.getGameID() - 1, gameData);
     }
 
     public static void createAuth(AuthData authData) {

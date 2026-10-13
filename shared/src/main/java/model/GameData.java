@@ -18,4 +18,20 @@ public class GameData {
     public int getGameID() {
         return gameID;
     }
+
+    public String getBlackUsername() {
+        return blackUsername;
+    }
+
+    public String getWhiteUsername() {
+        return whiteUsername;
+    }
+
+    public void setBlackUsername(String blackUsername) {
+        this.blackUsername = blackUsername;
+    }
+
+    public void setWhiteUsername(String whiteUsername) {
+        this.whiteUsername = whiteUsername;
+    }
 }

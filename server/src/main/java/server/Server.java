@@ -10,6 +10,7 @@ import services.Services;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class Server {
 
@@ -128,10 +129,32 @@ public class Server {
 
     private static void joinGame(Context ctx) {
         // Join Game
-        Services.isAuth("");
-        Services.getGame("");
-        Services.checkColor("");
-        Services.updateGame("");
+        String authToken = ctx.header("Authorization");
+        Map body = new Gson().fromJson(ctx.body(), Map.class);
+        String playerColor = body.get("playerColor").toString();
+        int gameID = ((Number) body.get("gameID")).intValue();
+
+        AuthData authData = Services.isAuth(authToken);
+        if (authData == null) {
+            // Throw Exception
+        }
+        GameData gameData = Services.getGame(gameID);
+        if (gameData == null) {
+            // Throw Exception
+        }
+
+        if (!Services.checkColor(playerColor, gameData)) {
+            // throw Exception
+        }
+
+        if (Objects.equals(playerColor, "WHITE")) {
+            gameData.setWhiteUsername(authData.getUsername());
+        } else if(Objects.equals(playerColor, "BLACK")) {
+            gameData.setBlackUsername(authData.getUsername());
+        }
+
+        Services.updateGame(gameData);
+        ctx.result("{ }");
     }
 
     public int run(int desiredPort) {
