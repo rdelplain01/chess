@@ -1,6 +1,7 @@
 package services;
 
 import dataaccess.DataAccess;
+import model.UserData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,8 +18,10 @@ class ServicesTest {
     }
 
     @Test
-    void register() {
-
+    void normalRegister() {
+        UserData userData = new UserData("test", "testPass", "test@mail.com");
+        Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+        assertEquals(userData, DataAccess.getUser(userData.getUsername()));
     }
 
     @Test
