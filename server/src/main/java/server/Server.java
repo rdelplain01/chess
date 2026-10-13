@@ -60,15 +60,38 @@ public class Server {
 
     private static void login(Context ctx) {
         // Login
-        Services.getUser("");
-        Services.verifyPassword("", "");
-        //Services.createAuth("");
+        Map body = new Gson().fromJson(ctx.body(), Map.class);
+        String username = body.get("username").toString();
+        String password = body.get("password").toString();
+
+        UserData user = Services.getUser(username);
+
+        if (user == null) {
+            // throw exception
+        }
+
+        if (!Services.verifyPassword(password, user)) {
+            // Throw Exception
+        }
+
+        AuthData authData = new AuthData(user.getUsername());
+
+        Services.createAuth(authData);
+
+        var result = Map.of("username", user.getUsername(), "authToken", authData.getAuthToken());
+        ctx.result(new Gson().toJson(result));
     }
 
     private static void logout(Context ctx) {
         // Logout
-        Services.isAuth("");
-        Services.deleteAuth("");
+        String authToken = ctx.header("Authorization");
+
+        AuthData authData = Services.isAuth(authToken);
+        if (authData == null) {
+            // Throw Exception
+        }
+        Services.deleteAuth(authData);
+        ctx.result("{ }");
     }
 
     private static void listGames(Context ctx) {

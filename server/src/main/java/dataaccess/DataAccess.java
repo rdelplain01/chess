@@ -56,11 +56,18 @@ public class DataAccess {
         authDataList.add(authData);
     }
 
-    public static void getAuth() {
+    public static AuthData getAuth(String authToken) {
         // get auth
+        for (var auth : authDataList) {
+            if (Objects.equals(auth.getAuthToken(), authToken)) {
+                return auth;
+            }
+        }
+        return null;
     }
 
-    public static void deleteAuth() {
+    public static void deleteAuth(AuthData authData) {
         // delete Auth
+        authDataList.remove(authData);
     }
 }

@@ -33,16 +33,19 @@ public class Services {
         DataAccess.createAuth(authData);
     }
 
-    public static void verifyPassword(String password, String userData) {
+    public static boolean verifyPassword(String password, UserData userData) {
         // Do stuff
+        return true;
     }
 
-    public static void isAuth(String authToken) {
+    public static AuthData isAuth(String authToken) {
         // Do stuff
+        return DataAccess.getAuth(authToken);
     }
 
-    public static void deleteAuth(String authData) {
+    public static void deleteAuth(AuthData authData) {
         // Do stuff
+        DataAccess.deleteAuth(authData);
     }
 
     public static void listGames() {
