@@ -29,15 +29,25 @@ public class Server {
 
     private static void register(Context ctx) {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
+
+        if (body.get("username") == null || body.get("password") == null || body.get("email") == null) {
+            ctx.status(400);
+            var result = Map.of("message", "Error: Please provide a username, password, or email");
+            ctx.result(new Gson().toJson(result));
+            return;
+        }
+
         String username = body.get("username").toString();
         String password = body.get("password").toString();
         String email = body.get("email").toString();
         AuthData authData;
 
-
         try {
             authData = Services.register(username, password, email);
         } catch (Exception e) {
+            ctx.status(403);
+            var result = Map.of("message", e.getMessage());
+            ctx.result(new Gson().toJson(result));
             return;
         }
 

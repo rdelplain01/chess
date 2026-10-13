@@ -1,6 +1,7 @@
 package services;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -28,11 +29,11 @@ public class Services {
         return false;
     }
 
-    public static AuthData register(String username, String password, String email) {
+    public static AuthData register(String username, String password, String email) throws DataAccessException {
         UserData userData = new UserData(username, password, email);
 
         if (DataAccess.getUser(username) != null) {
-            // Throw exception
+            throw new DataAccessException("Error: username already taken");
         }
         DataAccess.createUser(userData);
 
