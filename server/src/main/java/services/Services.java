@@ -52,8 +52,9 @@ public class Services {
         // Do stuff
     }
 
-    public static void createGame() {
+    public static int createGame(String gameName) {
         // Do stuff
+        return DataAccess.createGame(gameName);
     }
 
     public static void getGame(String gameID) {

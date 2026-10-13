@@ -35,8 +35,11 @@ public class DataAccess {
         return null;
     }
 
-    public static void createGame() {
+    public static int createGame(String gameName) {
         // create Game
+        GameData game = new GameData(gameName, gameDataList.toArray().length+1);
+        gameDataList.add(game);
+        return game.getGameID();
     }
 
     public static void getGame() {

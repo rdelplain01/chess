@@ -102,8 +102,18 @@ public class Server {
 
     private static void createGame(Context ctx) {
         // Create Game
-        Services.isAuth("");
-        Services.createGame();
+        String authToken = ctx.header("Authorization");
+        Map body = new Gson().fromJson(ctx.body(), Map.class);
+        String gameName = body.get("gameName").toString();
+
+        AuthData authData = Services.isAuth(authToken);
+        if (authData == null) {
+            // Throw Exception
+        }
+        int gameID = Services.createGame(gameName);
+
+        var result = Map.of("gameID", gameID);
+        ctx.result(new Gson().toJson(result));
     }
 
     private static void joinGame(Context ctx) {
