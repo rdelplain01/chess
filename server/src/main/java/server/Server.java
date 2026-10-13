@@ -5,12 +5,10 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 import services.Services;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
 public class Server {
 
@@ -34,13 +32,13 @@ public class Server {
         String username = body.get("username").toString();
         String password = body.get("password").toString();
         String email = body.get("email").toString();
-        AuthData authData = null;
+        AuthData authData;
 
 
         try {
             authData = Services.register(username, password, email);
         } catch (Exception e) {
-            // do something
+            return;
         }
 
         var result = Map.of("username", username, "authToken", authData.getAuthToken());
@@ -49,9 +47,7 @@ public class Server {
 
     private static void deleteDB(Context ctx) {
         // Delete Database
-        Services.clearUsers();
-        Services.clearGames();
-        Services.clearAuth();
+        Services.clear();
     }
 
     private static void login(Context ctx) {
@@ -59,22 +55,16 @@ public class Server {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
         String username = body.get("username").toString();
         String password = body.get("password").toString();
+        AuthData authData;
 
-        UserData user = Services.getUser(username);
-
-        if (user == null) {
-            // throw exception
+        try {
+            authData = Services.login(username, password);
+        } catch (Exception e) {
+            return;
         }
 
-        if (!Services.verifyPassword(password, user)) {
-            // Throw Exception
-        }
 
-        AuthData authData = new AuthData(user.getUsername());
-
-        Services.createAuth(authData);
-
-        var result = Map.of("username", user.getUsername(), "authToken", authData.getAuthToken());
+        var result = Map.of("username", authData.getUsername(), "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
     }
 
@@ -82,23 +72,25 @@ public class Server {
         // Logout
         String authToken = ctx.header("Authorization");
 
-        AuthData authData = Services.isAuth(authToken);
-        if (authData == null) {
-            // Throw Exception
+        try {
+            Services.logout(authToken);
+        } catch (Exception e) {
+            return;
         }
-        Services.deleteAuth(authData);
+
         ctx.result("{ }");
     }
 
     private static void listGames(Context ctx) {
         // List Games
         String authToken = ctx.header("Authorization");
+        ArrayList<GameData> gameList;
 
-        AuthData authData = Services.isAuth(authToken);
-        if (authData == null) {
-            // Throw Exception
+        try {
+            gameList = Services.listGames(authToken);
+        } catch (Exception e) {
+            return;
         }
-        ArrayList<GameData> gameList = Services.listGames();
 
         var result = Map.of("games", gameList);
         ctx.result(new Gson().toJson(result));
@@ -109,12 +101,13 @@ public class Server {
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
         String gameName = body.get("gameName").toString();
+        int gameID;
 
-        AuthData authData = Services.isAuth(authToken);
-        if (authData == null) {
-            // Throw Exception
+        try {
+            gameID = Services.createGame(authToken, gameName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        int gameID = Services.createGame(gameName);
 
         var result = Map.of("gameID", gameID);
         ctx.result(new Gson().toJson(result));
@@ -127,26 +120,12 @@ public class Server {
         String playerColor = body.get("playerColor").toString();
         int gameID = ((Number) body.get("gameID")).intValue();
 
-        AuthData authData = Services.isAuth(authToken);
-        if (authData == null) {
-            // Throw Exception
-        }
-        GameData gameData = Services.getGame(gameID);
-        if (gameData == null) {
-            // Throw Exception
+        try {
+            Services.joinGame(authToken, gameID, playerColor);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        if (!Services.checkColor(playerColor, gameData)) {
-            // throw Exception
-        }
-
-        if (Objects.equals(playerColor, "WHITE")) {
-            gameData.setWhiteUsername(authData.getUsername());
-        } else if(Objects.equals(playerColor, "BLACK")) {
-            gameData.setBlackUsername(authData.getUsername());
-        }
-
-        Services.updateGame(gameData);
         ctx.result("{ }");
     }
 
