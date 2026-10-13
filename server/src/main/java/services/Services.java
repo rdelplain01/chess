@@ -2,7 +2,10 @@ package services;
 
 import dataaccess.DataAccess;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+
+import java.util.ArrayList;
 
 public class Services {
     public static void clearUsers() {
@@ -48,8 +51,9 @@ public class Services {
         DataAccess.deleteAuth(authData);
     }
 
-    public static void listGames() {
+    public static ArrayList<GameData> listGames() {
         // Do stuff
+        return DataAccess.listGames();
     }
 
     public static int createGame(String gameName) {

@@ -46,8 +46,9 @@ public class DataAccess {
         // get Game
     }
 
-    public static void listGames() {
+    public static ArrayList<GameData> listGames() {
         // list games
+        return gameDataList;
     }
 
     public static void updateGame() {

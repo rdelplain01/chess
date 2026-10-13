@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import services.Services;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Server {
@@ -96,8 +98,16 @@ public class Server {
 
     private static void listGames(Context ctx) {
         // List Games
-        Services.isAuth("");
-        Services.listGames();
+        String authToken = ctx.header("Authorization");
+
+        AuthData authData = Services.isAuth(authToken);
+        if (authData == null) {
+            // Throw Exception
+        }
+        ArrayList<GameData> gameList = Services.listGames();
+
+        var result = Map.of("games", gameList);
+        ctx.result(new Gson().toJson(result));
     }
 
     private static void createGame(Context ctx) {
