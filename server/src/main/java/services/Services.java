@@ -81,4 +81,19 @@ public class Services {
         // Do stuff
         DataAccess.updateGame(gameData);
     }
+
+    public static AuthData register(String username, String password, String email) {
+        UserData userData = new UserData(username, password, email);
+
+        if (DataAccess.getUser(username) != null) {
+            // Throw exception
+        }
+        DataAccess.createUser(userData);
+
+        AuthData authData = new AuthData(username);
+
+        DataAccess.createAuth(authData);
+
+        return authData;
+    }
 }

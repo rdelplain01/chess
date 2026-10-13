@@ -34,21 +34,14 @@ public class Server {
         String username = body.get("username").toString();
         String password = body.get("password").toString();
         String email = body.get("email").toString();
+        AuthData authData = null;
 
-        // Maybe should be in services
 
-        UserData userData = new UserData(username, password, email);
-
-        if (Services.getUser(username) != null) {
-            // Throw exception
+        try {
+            authData = Services.register(username, password, email);
+        } catch (Exception e) {
+            // do something
         }
-        Services.createUser(userData);
-
-        AuthData authData = new AuthData(username);
-
-        Services.createAuth(authData);
-
-        //---
 
         var result = Map.of("username", username, "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
