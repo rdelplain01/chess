@@ -63,6 +63,14 @@ public class Server {
     private static void login(Context ctx) {
         // Login
         Map body = new Gson().fromJson(ctx.body(), Map.class);
+
+        if (body.get("username") == null || body.get("password") == null) {
+            ctx.status(400);
+            var result = Map.of("message", "Error: Please provide a username, password, or email");
+            ctx.result(new Gson().toJson(result));
+            return;
+        }
+
         String username = body.get("username").toString();
         String password = body.get("password").toString();
         AuthData authData;
@@ -70,6 +78,9 @@ public class Server {
         try {
             authData = Services.login(username, password);
         } catch (Exception e) {
+            ctx.status(401);
+            var result = Map.of("message", e.getMessage());
+            ctx.result(new Gson().toJson(result));
             return;
         }
 

@@ -2,6 +2,7 @@ package services;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +47,36 @@ class ServicesTest {
         });
     }
 
+    UserData createDummyUser() {
+        UserData userData = new UserData("test", "testPass", "test@mail.com");
+        assertDoesNotThrow(() -> {
+            Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+        });
+        return userData;
+    }
+
     @Test
-    void login() {
+    void normalLogin() {
+        UserData user = createDummyUser();
+        assertDoesNotThrow(() -> {
+            Services.login(user.getUsername(), user.getPassword());
+        });
+    }
+
+    @Test
+    void badUsernameLogin() {
+        UserData user = createDummyUser();
+        assertThrows(DataAccessException.class, () -> {
+            Services.login("idk", user.getPassword());
+        });
+    }
+
+    @Test
+    void badPasswordLogin() {
+        UserData user = createDummyUser();
+        assertThrows(DataAccessException.class, () -> {
+            Services.login(user.getUsername(), "idk123");
+        });
     }
 
     @Test

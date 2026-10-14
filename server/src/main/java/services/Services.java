@@ -17,7 +17,7 @@ public class Services {
 
     private static boolean verifyPassword(String password, UserData userData) {
         // Do stuff
-        return true;
+        return Objects.equals(password, userData.getPassword());
     }
 
     private static boolean checkColor(String playerColor, GameData gameData) {
@@ -44,15 +44,15 @@ public class Services {
         return authData;
     }
 
-    public static AuthData login(String username, String password) {
+    public static AuthData login(String username, String password) throws DataAccessException {
         UserData user = DataAccess.getUser(username);
 
         if (user == null) {
-            // throw exception
+            throw new DataAccessException("Error: username or password is incorrect");
         }
 
         if (!verifyPassword(password, user)) {
-            // Throw Exception
+            throw new DataAccessException("Error: username or password is incorrect");
         }
 
         AuthData authData = new AuthData(user.getUsername());
