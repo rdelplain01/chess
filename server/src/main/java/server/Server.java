@@ -96,6 +96,9 @@ public class Server {
         try {
             Services.logout(authToken);
         } catch (Exception e) {
+            ctx.status(401);
+            var result = Map.of("message", e.getMessage());
+            ctx.result(new Gson().toJson(result));
             return;
         }
 

@@ -62,10 +62,10 @@ public class Services {
         return authData;
     }
 
-    public static void logout(String authToken) {
+    public static void logout(String authToken) throws DataAccessException {
         AuthData authData = DataAccess.getAuth(authToken);
         if (authData == null) {
-            // Throw Exception
+            throw new DataAccessException("Error: Invalid Permissions");
         }
         DataAccess.deleteAuth(authData);
     }

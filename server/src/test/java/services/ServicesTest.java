@@ -80,7 +80,19 @@ class ServicesTest {
     }
 
     @Test
-    void logout() {
+    void normalLogout() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        assertDoesNotThrow(()->{
+            Services.logout(authData.getAuthToken());
+        });
+    }
+
+    @Test
+    void badLogout() {
+        assertThrows(DataAccessException.class,()->{
+            Services.logout("1");
+        });
     }
 
     @Test
