@@ -80,10 +80,10 @@ public class Services {
         return gameList;
     }
 
-    public static int createGame(String authToken, String gameName) {
+    public static int createGame(String authToken, String gameName) throws DataAccessException {
         AuthData authData = DataAccess.getAuth(authToken);
         if (authData == null) {
-            // Throw Exception
+            throw new DataAccessException("Error: Invalid Permissions");
         }
         int gameID = DataAccess.createGame(gameName);
 

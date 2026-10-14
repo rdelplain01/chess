@@ -100,7 +100,20 @@ class ServicesTest {
     }
 
     @Test
-    void createGame() {
+    void normalCreateGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        assertDoesNotThrow(() -> {
+            Services.createGame(authData.getAuthToken(), "test" );
+        });
+    }
+
+    @Test
+    void badCreateGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        assertThrows(DataAccessException.class,() -> {
+            Services.createGame("1", "test" );
+        });
     }
 
     @Test

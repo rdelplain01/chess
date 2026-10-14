@@ -124,13 +124,24 @@ public class Server {
         // Create Game
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
+
+        if (body.get("gameName") == null) {
+            ctx.status(400);
+            var result = Map.of("message", "Error: Game name can not be empty");
+            ctx.result(new Gson().toJson(result));
+            return;
+        }
+
         String gameName = body.get("gameName").toString();
         int gameID;
 
         try {
             gameID = Services.createGame(authToken, gameName);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            ctx.status(401);
+            var result = Map.of("message", e.getMessage());
+            ctx.result(new Gson().toJson(result));
+            return;
         }
 
         var result = Map.of("gameID", gameID);
