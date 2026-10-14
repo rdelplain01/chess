@@ -96,7 +96,23 @@ class ServicesTest {
     }
 
     @Test
-    void listGames() {
+    void normalListGames() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        Services.createGame(authData.getAuthToken(), "test" );
+        assertDoesNotThrow(() -> {
+            Services.listGames(authData.getAuthToken());
+        });
+    }
+
+    @Test
+    void badListGames() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        Services.createGame(authData.getAuthToken(), "test" );
+        assertThrows(DataAccessException.class,() -> {
+            Services.listGames("1");
+        });
     }
 
     @Test

@@ -70,10 +70,10 @@ public class Services {
         DataAccess.deleteAuth(authData);
     }
 
-    public static ArrayList<GameData> listGames(String authToken) {
+    public static ArrayList<GameData> listGames(String authToken) throws DataAccessException {
         AuthData authData = DataAccess.getAuth(authToken);
         if (authData == null) {
-            // Throw Exception
+            throw new DataAccessException("Error: Invalid Permissions");
         }
         ArrayList<GameData> gameList = DataAccess.listGames();
 
