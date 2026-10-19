@@ -6,7 +6,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
-import services.Services;
+import service.Services;
 
 import java.util.ArrayList;
 import java.util.Map;
