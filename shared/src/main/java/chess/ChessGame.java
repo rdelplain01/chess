@@ -14,6 +14,7 @@ public class ChessGame {
 
     private TeamColor turn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
+
     public ChessGame() {
         board.resetBoard();
     }
@@ -50,7 +51,7 @@ public class ChessGame {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        while (myPosition.moveInbounds(row+dir[0], col+dir[1])) {
+        while (myPosition.moveInbounds(row + dir[0], col + dir[1])) {
             row += dir[0];
             col += dir[1];
 
@@ -72,12 +73,14 @@ public class ChessGame {
     private ArrayList<ChessPosition> finiteMove(int[][] moves, ChessPiece.PieceType pieceType, ChessPosition myPosition, TeamColor myColor) {
         ArrayList<ChessPosition> moveList = new ArrayList<>();
         for (var move : moves) {
-            if (!myPosition.moveInbounds(myPosition.getRow()+move[0], myPosition.getColumn()+move[1])) { continue; }
-            var check = board.getPiece(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
+            if (!myPosition.moveInbounds(myPosition.getRow() + move[0], myPosition.getColumn() + move[1])) {
+                continue;
+            }
+            var check = board.getPiece(new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]));
             if (check != null && check.getTeamColor() != myColor) {
                 ChessPiece.PieceType type = check.getPieceType();
                 if (type == pieceType) {
-                    moveList.add(new ChessPosition(myPosition.getRow()+move[0], myPosition.getColumn()+move[1]));
+                    moveList.add(new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]));
                 }
             }
         }
@@ -86,41 +89,41 @@ public class ChessGame {
 
     private ArrayList<ChessPosition> pinSet(TeamColor myColor, ChessPosition myPosition) {
         int[][] strait = {
-                { 1,  0},
-                { 0,  1},
-                {-1,  0},
-                { 0, -1}
+                {1, 0},
+                {0, 1},
+                {-1, 0},
+                {0, -1}
         };
         int[][] knight = {
-                { 1, 2},
-                { 1,-2},
-                { 2, 1},
+                {1, 2},
+                {1, -2},
+                {2, 1},
                 {-2, 1},
                 {-1, 2},
-                {-1,-2},
-                { 2,-1},
-                {-2,-1}
+                {-1, -2},
+                {2, -1},
+                {-2, -1}
         };
         int[][] diagonal = {
-                { 1,  1},
-                { 1, -1},
-                {-1,  1},
+                {1, 1},
+                {1, -1},
+                {-1, 1},
                 {-1, -1}
         };
         int[][] king = {
-                { 1,  1},
-                { 1, -1},
-                {-1,  1},
+                {1, 1},
+                {1, -1},
+                {-1, 1},
                 {-1, -1},
-                { 1,  0},
-                { 0,  1},
-                {-1,  0},
-                { 0, -1}
+                {1, 0},
+                {0, 1},
+                {-1, 0},
+                {0, -1}
         };
 
         int[][] pawn = myColor == TeamColor.WHITE
-                ? new int[][] { { 1,  1 }, { 1, -1 } }
-                : new int[][] { { -1, 1 }, { -1, -1 } };
+                ? new int[][]{{1, 1}, {1, -1}}
+                : new int[][]{{-1, 1}, {-1, -1}};
 
 
         ArrayList<ChessPosition> moveList = new ArrayList<>();
@@ -234,18 +237,9 @@ public class ChessGame {
         return null;
     }
 
-    /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
-    public boolean isInCheckmate(TeamColor teamColor) {
+    private boolean hasNoValidMoves(TeamColor teamColor) {
         ChessPosition kingPosition = findKing(teamColor);
         Collection<ChessMove> kingMoves = board.getPiece(kingPosition).pieceMoves(board, kingPosition);
-        if (!isInCheck(teamColor)) {
-            return false;
-        }
         for (var move : kingMoves) {
             if (!isPositionInCheck(teamColor, move.getEndPosition())) {
                 return false;
@@ -267,6 +261,16 @@ public class ChessGame {
     }
 
     /**
+     * Determines if the given team is in checkmate
+     *
+     * @param teamColor which team to check for checkmate
+     * @return True if the specified team is in checkmate
+     */
+    public boolean isInCheckmate(TeamColor teamColor) {
+        return isInCheck(teamColor) && hasNoValidMoves(teamColor);
+    }
+
+    /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
      *
@@ -274,29 +278,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        ChessPosition kingPosition = findKing(teamColor);
-        Collection<ChessMove> kingMoves = board.getPiece(kingPosition).pieceMoves(board, kingPosition);
-        if (isInCheck(teamColor)) {
-            return false;
-        }
-        for (var move : kingMoves) {
-            if (!isPositionInCheck(teamColor, move.getEndPosition())) {
-                return false;
-            }
-        }
-        ArrayList<ChessMove> validMovesList = new ArrayList<>();
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition check = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(check);
-                if (piece != null) {
-                    if (piece.getTeamColor() == teamColor) {
-                        validMovesList.addAll(validMoves(check));
-                    }
-                }
-            }
-        }
-        return validMovesList.isEmpty();
+        return !isInCheck(teamColor) && hasNoValidMoves(teamColor);
     }
 
     /**
