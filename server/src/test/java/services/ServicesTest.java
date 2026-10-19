@@ -1,6 +1,7 @@
 package services;
 
 import dataaccess.DataAccess;
+import dataaccess.LocalDataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
@@ -11,46 +12,50 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ServicesTest {
 
+    DataAccess dataAccess;
+    Services services;
+
     @BeforeEach
-    void clearAll() {
-        Services.clear();
+    void setup() {
+        dataAccess = new LocalDataAccess();
+        services = new Services(dataAccess);
     }
 
     @Test
     void clear() {
         String username = "test";
         assertDoesNotThrow(()-> {
-            Services.register(username, "testPass", "test@mail.com");
+            services.register(username, "testPass", "test@mail.com");
         });
-        assertNotNull(DataAccess.getUser(username));
-        Services.clear();
-        assertNull(DataAccess.getUser(username));
+        assertNotNull(dataAccess.getUser(username));
+        services.clear();
+        assertNull(dataAccess.getUser(username));
     }
 
     @Test
     void normalRegister() {
         UserData userData = new UserData("test", "testPass", "test@mail.com");
         assertDoesNotThrow(() -> {
-            Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+            services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
         });
-        assertEquals(userData, DataAccess.getUser(userData.getUsername()));
+        assertEquals(userData, dataAccess.getUser(userData.getUsername()));
     }
 
     @Test
     void userNameExistsRegister() {
         UserData userData = new UserData("test", "testPass", "test@mail.com");
         assertDoesNotThrow(() -> {
-            Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+            services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
         });
         assertThrows(DataAccessException.class, () -> {
-            Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+            services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
         });
     }
 
     UserData createDummyUser() {
         UserData userData = new UserData("test", "testPass", "test@mail.com");
         assertDoesNotThrow(() -> {
-            Services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
+            services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
         });
         return userData;
     }
@@ -59,7 +64,7 @@ class ServicesTest {
     void normalLogin() {
         UserData user = createDummyUser();
         assertDoesNotThrow(() -> {
-            Services.login(user.getUsername(), user.getPassword());
+            services.login(user.getUsername(), user.getPassword());
         });
     }
 
@@ -67,7 +72,7 @@ class ServicesTest {
     void badUsernameLogin() {
         UserData user = createDummyUser();
         assertThrows(DataAccessException.class, () -> {
-            Services.login("idk", user.getPassword());
+            services.login("idk", user.getPassword());
         });
     }
 
@@ -75,128 +80,128 @@ class ServicesTest {
     void badPasswordLogin() {
         UserData user = createDummyUser();
         assertThrows(DataAccessException.class, () -> {
-            Services.login(user.getUsername(), "idk123");
+            services.login(user.getUsername(), "idk123");
         });
     }
 
     @Test
     void normalLogout() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         assertDoesNotThrow(()->{
-            Services.logout(authData.getAuthToken());
+            services.logout(authData.getAuthToken());
         });
     }
 
     @Test
     void badLogout() {
         assertThrows(DataAccessException.class,()->{
-            Services.logout("1");
+            services.logout("1");
         });
     }
 
     @Test
     void normalListGames() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
-        Services.createGame(authData.getAuthToken(), "test" );
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
+        services.createGame(authData.getAuthToken(), "test" );
         assertDoesNotThrow(() -> {
-            Services.listGames(authData.getAuthToken());
+            services.listGames(authData.getAuthToken());
         });
     }
 
     @Test
     void badListGames() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
-        Services.createGame(authData.getAuthToken(), "test" );
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
+        services.createGame(authData.getAuthToken(), "test" );
         assertThrows(DataAccessException.class,() -> {
-            Services.listGames("1");
+            services.listGames("1");
         });
     }
 
     @Test
     void normalCreateGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         assertDoesNotThrow(() -> {
-            Services.createGame(authData.getAuthToken(), "test" );
+            services.createGame(authData.getAuthToken(), "test" );
         });
     }
 
     @Test
-    void badCreateGame() throws DataAccessException {
-        UserData user = createDummyUser();
+    void badCreateGame() {
+        createDummyUser();
         assertThrows(DataAccessException.class,() -> {
-            Services.createGame("1", "test" );
+            services.createGame("1", "test" );
         });
     }
 
     @Test
     void normalWhiteJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        int gameID = services.createGame(authData.getAuthToken(), gameName);
         assertDoesNotThrow(() -> {
-            Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+            services.joinGame(authData.getAuthToken(), gameID, "WHITE");
         });
     }
 
     @Test
     void normalBlackJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        int gameID = services.createGame(authData.getAuthToken(), gameName);
         assertDoesNotThrow(() -> {
-            Services.joinGame(authData.getAuthToken(), gameID, "BLACK");
+            services.joinGame(authData.getAuthToken(), gameID, "BLACK");
         });
     }
 
     @Test
     void badAuthJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        int gameID = services.createGame(authData.getAuthToken(), gameName);
         assertThrows(DataAccessException.class,() -> {
-            Services.joinGame("1", gameID, "WHITE");
+            services.joinGame("1", gameID, "WHITE");
         });
     }
 
     @Test
     void badGameIDJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        Services.createGame(authData.getAuthToken(), gameName);
+        services.createGame(authData.getAuthToken(), gameName);
         assertThrows(DataAccessException.class,() -> {
-            Services.joinGame(authData.getAuthToken(), 15, "WHITE");
+            services.joinGame(authData.getAuthToken(), 15, "WHITE");
         });
     }
 
     @Test
     void badColorJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        int gameID = Services.createGame(authData.getAuthToken(), gameName);
-        Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        int gameID = services.createGame(authData.getAuthToken(), gameName);
+        services.joinGame(authData.getAuthToken(), gameID, "WHITE");
         assertThrows(DataAccessException.class,() -> {
-            Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+            services.joinGame(authData.getAuthToken(), gameID, "WHITE");
         });
     }
 
     @Test
     void badColorDoesNotExistJoinGame() throws DataAccessException {
         UserData user = createDummyUser();
-        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        AuthData authData = services.login(user.getUsername(), user.getPassword());
         String gameName = "test";
-        int gameID = Services.createGame(authData.getAuthToken(), gameName);
-        Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        int gameID = services.createGame(authData.getAuthToken(), gameName);
+        services.joinGame(authData.getAuthToken(), gameID, "WHITE");
         assertThrows(DataAccessException.class,() -> {
-            Services.joinGame(authData.getAuthToken(), gameID, "GREEN");
+            services.joinGame(authData.getAuthToken(), gameID, "GREEN");
         });
     }
 }

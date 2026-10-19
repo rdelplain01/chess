@@ -5,75 +5,25 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class DataAccess {
+public interface DataAccess {
+    void clear();
 
-    private static ArrayList<AuthData> authDataList = new ArrayList<>();
-    private static ArrayList<UserData> userDataList = new ArrayList<>();
-    private static ArrayList<GameData> gameDataList = new ArrayList<>();
+    void createUser(UserData userData);
 
-    public static void clear() {
-        // clear
-        authDataList.clear();
-        userDataList.clear();
-        gameDataList.clear();
-    }
+    UserData getUser(String username);
 
-    public static void createUser(UserData userData) {
-        // create user
-        userDataList.add(userData);
-    }
+    int createGame(String gameName);
 
-    public static UserData getUser(String username) {
-        // get User
-        for (var user : userDataList) {
-            if (Objects.equals(user.getUsername(), username)) {
-                return user;
-            }
-        }
-        return null;
-    }
+    GameData getGame(int gameID);
 
-    public static int createGame(String gameName) {
-        // create Game
-        GameData game = new GameData(gameName, gameDataList.toArray().length+1);
-        gameDataList.add(game);
-        return game.getGameID();
-    }
+    ArrayList<GameData> listGames();
 
-    public static GameData getGame(int gameID) {
-        // get Game
-        return gameDataList.get(gameID - 1);
-    }
+    void updateGame(GameData gameData);
 
-    public static ArrayList<GameData> listGames() {
-        // list games
-        return gameDataList;
-    }
+    void createAuth(AuthData authData);
 
-    public static void updateGame(GameData gameData) {
-        // update Game
-        gameDataList.set(gameData.getGameID() - 1, gameData);
-    }
+    AuthData getAuth(String authToken);
 
-    public static void createAuth(AuthData authData) {
-        // create Auth
-        authDataList.add(authData);
-    }
-
-    public static AuthData getAuth(String authToken) {
-        // get auth
-        for (var auth : authDataList) {
-            if (Objects.equals(auth.getAuthToken(), authToken)) {
-                return auth;
-            }
-        }
-        return null;
-    }
-
-    public static void deleteAuth(AuthData authData) {
-        // delete Auth
-        authDataList.remove(authData);
-    }
+    void deleteAuth(AuthData authData);
 }
