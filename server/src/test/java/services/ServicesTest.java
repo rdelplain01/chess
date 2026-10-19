@@ -133,6 +133,70 @@ class ServicesTest {
     }
 
     @Test
-    void joinGame() {
+    void normalWhiteJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        assertDoesNotThrow(() -> {
+            Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        });
+    }
+
+    @Test
+    void normalBlackJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        assertDoesNotThrow(() -> {
+            Services.joinGame(authData.getAuthToken(), gameID, "BLACK");
+        });
+    }
+
+    @Test
+    void badAuthJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        assertThrows(DataAccessException.class,() -> {
+            Services.joinGame("1", gameID, "WHITE");
+        });
+    }
+
+    @Test
+    void badGameIDJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        Services.createGame(authData.getAuthToken(), gameName);
+        assertThrows(DataAccessException.class,() -> {
+            Services.joinGame(authData.getAuthToken(), 15, "WHITE");
+        });
+    }
+
+    @Test
+    void badColorJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        assertThrows(DataAccessException.class,() -> {
+            Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        });
+    }
+
+    @Test
+    void badColorDoesNotExistJoinGame() throws DataAccessException {
+        UserData user = createDummyUser();
+        AuthData authData = Services.login(user.getUsername(), user.getPassword());
+        String gameName = "test";
+        int gameID = Services.createGame(authData.getAuthToken(), gameName);
+        Services.joinGame(authData.getAuthToken(), gameID, "WHITE");
+        assertThrows(DataAccessException.class,() -> {
+            Services.joinGame(authData.getAuthToken(), gameID, "GREEN");
+        });
     }
 }

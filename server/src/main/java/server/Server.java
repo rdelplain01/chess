@@ -9,6 +9,7 @@ import services.Services;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class Server {
 
@@ -26,14 +27,17 @@ public class Server {
         javalin.put("/game", Server::joinGame);
     }
 
+    private static void throwError(int code, String message, Context ctx) {
+        ctx.status(code);
+        var result = Map.of("message", message);
+        ctx.result(new Gson().toJson(result));
+    }
 
     private static void register(Context ctx) {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
         if (body.get("username") == null || body.get("password") == null || body.get("email") == null) {
-            ctx.status(400);
-            var result = Map.of("message", "Error: Please provide a username, password, or email");
-            ctx.result(new Gson().toJson(result));
+            throwError(400, "Error: Please provide a username, password, or email", ctx);
             return;
         }
 
@@ -45,9 +49,7 @@ public class Server {
         try {
             authData = Services.register(username, password, email);
         } catch (Exception e) {
-            ctx.status(403);
-            var result = Map.of("message", e.getMessage());
-            ctx.result(new Gson().toJson(result));
+            throwError(403, e.getMessage(), ctx);
             return;
         }
 
@@ -65,9 +67,7 @@ public class Server {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
         if (body.get("username") == null || body.get("password") == null) {
-            ctx.status(400);
-            var result = Map.of("message", "Error: Please provide a username, password, or email");
-            ctx.result(new Gson().toJson(result));
+            throwError(400, "Error: Please provide a username, password, or email", ctx);
             return;
         }
 
@@ -78,12 +78,9 @@ public class Server {
         try {
             authData = Services.login(username, password);
         } catch (Exception e) {
-            ctx.status(401);
-            var result = Map.of("message", e.getMessage());
-            ctx.result(new Gson().toJson(result));
+            throwError(401, e.getMessage(), ctx);
             return;
         }
-
 
         var result = Map.of("username", authData.getUsername(), "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
@@ -96,9 +93,7 @@ public class Server {
         try {
             Services.logout(authToken);
         } catch (Exception e) {
-            ctx.status(401);
-            var result = Map.of("message", e.getMessage());
-            ctx.result(new Gson().toJson(result));
+            throwError(401, e.getMessage(), ctx);
             return;
         }
 
@@ -113,9 +108,7 @@ public class Server {
         try {
             gameList = Services.listGames(authToken);
         } catch (Exception e) {
-            ctx.status(401);
-            var result = Map.of("message", e.getMessage());
-            ctx.result(new Gson().toJson(result));
+            throwError(401, e.getMessage(), ctx);
             return;
         }
 
@@ -129,9 +122,7 @@ public class Server {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
         if (body.get("gameName") == null) {
-            ctx.status(400);
-            var result = Map.of("message", "Error: Game name can not be empty");
-            ctx.result(new Gson().toJson(result));
+            throwError(400, "Error: Game name can not be empty", ctx);
             return;
         }
 
@@ -141,9 +132,7 @@ public class Server {
         try {
             gameID = Services.createGame(authToken, gameName);
         } catch (Exception e) {
-            ctx.status(401);
-            var result = Map.of("message", e.getMessage());
-            ctx.result(new Gson().toJson(result));
+            throwError(401, e.getMessage(), ctx);
             return;
         }
 
@@ -155,13 +144,30 @@ public class Server {
         // Join Game
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
+
+        if (body.get("gameID") == null || body.get("playerColor") == null ) {
+            ctx.status(400);
+            var result = Map.of("message", "Error: Game name can not be empty");
+            ctx.result(new Gson().toJson(result));
+            return;
+        }
+
         String playerColor = body.get("playerColor").toString();
         int gameID = ((Number) body.get("gameID")).intValue();
 
         try {
             Services.joinGame(authToken, gameID, playerColor);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (Objects.equals(e.getMessage(), "Error: Player color does not exist")) {
+                throwError(400, e.getMessage(), ctx);
+                return;
+            }
+            if (Objects.equals(e.getMessage(), "Error: game taken")) {
+                throwError(403, e.getMessage(), ctx);
+                return;
+            }
+            throwError(401, e.getMessage(), ctx);
+            return;
         }
 
         ctx.result("{ }");
