@@ -31,7 +31,6 @@ public class MySqlDataAccess implements DataAccess {
     public void createUser(UserData userData) throws DataAccessException {
         String statement = "INSERT INTO users (username, password, email) VALUES (\"%s\", \"%s\", \"%s\")"
                 .formatted(userData.getUsername(), userData.getPassword(), userData.getEmail());
-        System.out.println(statement);
         update(statement);
     }
 
@@ -72,7 +71,6 @@ public class MySqlDataAccess implements DataAccess {
     public int createGame(String gameName) throws DataAccessException {
         String statement = "INSERT INTO games (gameName, gameData) VALUES (\"%s\", \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\")"
                 .formatted(gameName);
-        System.out.println(statement);
         return update(statement);
     }
 
@@ -83,11 +81,7 @@ public class MySqlDataAccess implements DataAccess {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        GameData game = new GameData(rs.getString("gameName"), rs.getInt("id"));
-                        game.setBlackUsername(rs.getString("blackUsername"));
-                        game.setWhiteUsername(rs.getString("whiteUsername"));
-                        game.setGame(rs.getString("gameData"));
-                        return game;
+                        return readGames(rs);
                     }
                 }
             }
@@ -98,8 +92,29 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public ArrayList<GameData> listGames() {
-        return null;
+    public ArrayList<GameData> listGames() throws DataAccessException {
+        String statement = "SELECT id, whiteUsername, blackUsername, gameName, gameData FROM games";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    ArrayList<GameData> games = new ArrayList<>();
+                    while (rs.next()) {
+                        games.add(readGames(rs));
+                    }
+                    return games;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    private GameData readGames(ResultSet rs) throws SQLException {
+        GameData game = new GameData(rs.getString("gameName"), rs.getInt("id"));
+        game.setBlackUsername(rs.getString("blackUsername"));
+        game.setWhiteUsername(rs.getString("whiteUsername"));
+        game.setGame(rs.getString("gameData"));
+        return game;
     }
 
     @Override
