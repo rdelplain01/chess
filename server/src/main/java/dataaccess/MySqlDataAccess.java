@@ -29,37 +29,6 @@ public class MySqlDataAccess implements DataAccess {
                 .formatted(userData.getUsername(), userData.getPassword(), userData.getEmail());
         System.out.println(statement);
         update(statement);
-
-
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            var statement = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-//                    .formatted(userData.getUsername(), userData.getEmail(), userData.getPassword());
-//            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-//                //ps.setInt(1, id);
-//                try (ResultSet rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        return readPet(rs);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new DataAccessException("stuff");
-//        }
-
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT id, json FROM pet WHERE id=?";
-//            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-//                ps.setInt(1, id);
-//                try (ResultSet rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        return readPet(rs);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
-//        }
-        //String json = new Gson().toJson(userData);
     }
 
     private int update(String statement) throws DataAccessException {
@@ -129,19 +98,6 @@ public class MySqlDataAccess implements DataAccess {
     public void deleteAuth(AuthData authData) {
 
     }
-
-//    private void configureDatabase() throws ResponseException {
-//        DatabaseManager.createDatabase();
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            for (String statement : createStatements) {
-//                try (var preparedStatement = conn.prepareStatement(statement)) {
-//                    preparedStatement.executeUpdate();
-//                }
-//            }
-//        } catch (SQLException ex) {
-//            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to configure database: %s", ex.getMessage()));
-//        }
-//    }
 
     private final String[] createStatements = {
             """
