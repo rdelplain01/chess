@@ -34,4 +34,8 @@ public class GameData {
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
     }
+
+    public void setGame(String gameData) {
+        game.getBoard().fenBoard(gameData);
+    }
 }

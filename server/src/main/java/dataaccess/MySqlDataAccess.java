@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessBoard;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -65,12 +66,31 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public int createGame(String gameName) {
-        return 0;
+    public int createGame(String gameName) throws DataAccessException {
+        String statement = "INSERT INTO games (gameName, gameData) VALUES (\"%s\", \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\")"
+                .formatted(gameName);
+        System.out.println(statement);
+        return update(statement);
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
+        String statement = "SELECT id, whiteUsername, blackUsername, gameName, gameData FROM games WHERE id=\"%d\"".formatted(gameID);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        GameData game = new GameData(rs.getString("gameName"), rs.getInt("id"));
+                        game.setBlackUsername(rs.getString("blackUsername"));
+                        game.setWhiteUsername(rs.getString("whiteUsername"));
+                        game.setGame(rs.getString("gameData"));
+                        return game;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
@@ -122,7 +142,7 @@ public class MySqlDataAccess implements DataAccess {
               `whiteUsername` varchar(256),
               `blackUsername` varchar(256),
               `gameName` varchar(256) NOT NULL,
-              `gameData` TEXT NOT NULL,
+              `gameData` varchar(256) NOT NULL,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
