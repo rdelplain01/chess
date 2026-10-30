@@ -48,7 +48,7 @@ class DataAccessTest {
     }
 
 //    @Test
-//    void updateGame() {
+//    void updateGame() throws DataAccessException {
 //        int id = dataAccess.createGame("test");
 //        dataAccess.updateGame(dataAccess.getGame(id));
 //    }

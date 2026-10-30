@@ -38,4 +38,8 @@ public class GameData {
     public void setGame(String gameData) {
         game.getBoard().fenBoard(gameData);
     }
+
+    public ChessGame getGame() {
+        return game;
+    }
 }

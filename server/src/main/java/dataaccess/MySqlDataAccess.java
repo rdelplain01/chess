@@ -1,6 +1,9 @@
 package dataaccess;
 
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -100,8 +103,53 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(GameData gameData) {
+    public void updateGame(GameData gameData) throws DataAccessException {
+        String statement = "UPDATE games SET whiteUsername=%s, blackUsername=%s, gameData=\"%s\" WHERE id=%d"
+                .formatted(gameData.getWhiteUsername(), gameData.getBlackUsername(), decodeFEN(gameData.getGame()), gameData.getGameID());
+        update(statement);
+    }
 
+    private String decodeFEN(ChessGame game) {
+        ChessBoard board = game.getBoard();
+        StringBuilder FEN = new StringBuilder();
+        int space = 0;
+        boolean first = true;
+        for (int i = 8; i > 0; i--) {
+            if (space > 0) {
+                FEN.append(space);
+            }
+            if (!first) {
+                FEN.append('/');
+            }
+            first = false;
+            space = 0;
+            for (int j = 1; j < board.squares[0].length + 1; j++) {
+                if (board.getPiece(new ChessPosition(i, j)) == null) {
+                    space++;
+                } else {
+                    if (space > 0) {
+                        FEN.append("/");
+                        FEN.append(space);
+                        FEN.append("/");
+                        space = 0;
+                    }
+                    Character piece;
+                    switch (board.getPiece(new ChessPosition(i, j)).getPieceType()) {
+                        case ROOK -> piece = 'R';
+                        case KNIGHT -> piece = 'N';
+                        case BISHOP -> piece = 'B';
+                        case KING -> piece = 'K';
+                        case QUEEN -> piece = 'Q';
+                        default -> piece = 'P';
+                    }
+                    if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        piece = Character.toLowerCase(piece);
+                    }
+                    FEN.append(piece);
+                }
+            }
+        }
+        return FEN.toString();
     }
 
     @Override
