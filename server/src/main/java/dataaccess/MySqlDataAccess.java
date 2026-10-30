@@ -69,7 +69,7 @@ public class MySqlDataAccess implements DataAccess {
 
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return 1;
+                    return rs.getInt(1);
                 }
             }
         } catch (Exception e) {
@@ -80,14 +80,13 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        String statement = "SELECT username FROM users WHERE username=\"%s\"".formatted(username);
+        String statement = "SELECT username, password, email FROM users WHERE username=\"%s\"".formatted(username);
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    }
                 }
             }
         } catch (Exception e) {
