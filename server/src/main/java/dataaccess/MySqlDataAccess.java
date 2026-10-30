@@ -168,18 +168,33 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData authData) {
-
+    public void createAuth(AuthData authData) throws DataAccessException {
+        String statement = "INSERT INTO auth (username, authToken) VALUES (\"%s\", \"%s\")"
+                .formatted(authData.getUsername(), authData.getAuthToken());
+        update(statement);
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        String statement = "SELECT authToken, username FROM auth WHERE authToken=\"%s\""
+                .formatted(authToken);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("username"), rs.getString("authToken"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
-
+    public void deleteAuth(AuthData authData) throws DataAccessException {
+        update("DELETE FROM auth WHERE authToken=\"%s\"".formatted(authData.getAuthToken()));
     }
 
     private final String[] createStatements = {
