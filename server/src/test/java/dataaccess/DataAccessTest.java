@@ -17,6 +17,7 @@ class DataAccessTest {
     @BeforeEach
     void setup() throws SQLException, DataAccessException {
         dataAccess = new MySqlDataAccess();
+        dataAccess.clear();
     }
 
     @Test

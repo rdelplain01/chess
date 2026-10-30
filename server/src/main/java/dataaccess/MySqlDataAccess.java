@@ -17,14 +17,16 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        update("TRUNCATE TABLE users");
+        update("TRUNCATE TABLE auth");
+        update("TRUNCATE TABLE games");
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        String statement = "INSERT INTO users (username, email, password) VALUES (\"%s\", \"%s\", \"%s\")"
-                .formatted(userData.getUsername(), userData.getEmail(), userData.getPassword());
+        String statement = "INSERT INTO users (username, password, email) VALUES (\"%s\", \"%s\", \"%s\")"
+                .formatted(userData.getUsername(), userData.getPassword(), userData.getEmail());
         System.out.println(statement);
         update(statement);
 
@@ -67,17 +69,30 @@ public class MySqlDataAccess implements DataAccess {
 
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    return 1;
                 }
-                return 0;
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
+        return 0;
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
+        String statement = "SELECT username FROM users WHERE username=\"%s\"".formatted(username);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
