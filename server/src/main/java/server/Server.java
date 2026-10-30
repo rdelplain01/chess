@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.LocalDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -61,7 +62,11 @@ public class Server {
 
     private void deleteDB(Context ctx) {
         // Delete Database
-        services.clear();
+        try {
+            services.clear();
+        } catch (DataAccessException e) {
+            throwError(500, e.getMessage(), ctx);
+        }
     }
 
     private void login(Context ctx) {
@@ -147,7 +152,7 @@ public class Server {
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
-        if (body.get("gameID") == null || body.get("playerColor") == null ) {
+        if (body.get("gameID") == null || body.get("playerColor") == null) {
             ctx.status(400);
             var result = Map.of("message", "Error: Game name can not be empty");
             ctx.result(new Gson().toJson(result));

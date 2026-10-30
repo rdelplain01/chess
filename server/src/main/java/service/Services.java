@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -17,7 +18,7 @@ public class Services {
         this.dataAccess = dataAccess;
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         // Clear Users
         dataAccess.clear();
     }
@@ -31,21 +32,23 @@ public class Services {
     }
 
     private boolean verifyPassword(String password, UserData userData) {
-        // Do stuff
-        return Objects.equals(password, userData.getPassword());
+        return BCrypt.checkpw(password, userData.getPassword());
     }
 
     private boolean checkColor(String playerColor, GameData gameData) throws DataAccessException {
         if (Objects.equals(playerColor, "WHITE")) {
             return gameData.getWhiteUsername() != null;
-        } else if(Objects.equals(playerColor, "BLACK")) {
+        } else if (Objects.equals(playerColor, "BLACK")) {
             return gameData.getBlackUsername() != null;
         }
         throw new DataAccessException("Error: Player color does not exist");
     }
 
     public AuthData register(String username, String password, String email) throws DataAccessException {
-        UserData userData = new UserData(username, password, email);
+        //Hash password
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+
+        UserData userData = new UserData(username, hash, email);
 
         if (dataAccess.getUser(username) != null) {
             throw new DataAccessException("Error: username already taken");
@@ -111,7 +114,7 @@ public class Services {
 
         if (Objects.equals(playerColor, "WHITE")) {
             gameData.setWhiteUsername(authData.getUsername());
-        } else if(Objects.equals(playerColor, "BLACK")) {
+        } else if (Objects.equals(playerColor, "BLACK")) {
             gameData.setBlackUsername(authData.getUsername());
         }
 

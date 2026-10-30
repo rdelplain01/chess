@@ -7,6 +7,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +39,12 @@ class ServicesTest {
         assertDoesNotThrow(() -> {
             services.register(userData.getUsername(), userData.getPassword(), userData.getEmail());
         });
-        assertEquals(userData, dataAccess.getUser(userData.getUsername()));
+        UserData stored = dataAccess.getUser(userData.getUsername());
+        assertNotNull(stored);
+        assertEquals(userData.getUsername(), stored.getUsername());
+        assertEquals(userData.getEmail(), stored.getEmail());
+        assertNotEquals(userData.getPassword(), stored.getPassword());
+        assertTrue(BCrypt.checkpw(userData.getPassword(), stored.getPassword()));
     }
 
     @Test

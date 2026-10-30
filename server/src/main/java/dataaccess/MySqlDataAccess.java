@@ -23,10 +23,10 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        String statement = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-                    .formatted(userData.getUsername(), userData.getEmail(), userData.getPassword());
+        String statement = "INSERT INTO users (username, email, password) VALUES (\"%s\", \"%s\", \"%s\")"
+                .formatted(userData.getUsername(), userData.getEmail(), userData.getPassword());
+        System.out.println(statement);
         update(statement);
-
 
 
 //        try (Connection conn = DatabaseManager.getConnection()) {
@@ -133,6 +133,7 @@ public class MySqlDataAccess implements DataAccess {
             """
             CREATE TABLE IF NOT EXISTS users (
               `username` varchar(256) NOT NULL,
+              `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
               PRIMARY KEY (`username`),
               INDEX(email)
@@ -140,19 +141,19 @@ public class MySqlDataAccess implements DataAccess {
             """,
             """
             CREATE TABLE IF NOT EXISTS auth (
-              `username` varchar(256) NOT NULL,
               `authToken` varchar(256) NOT NULL,
-              PRIMARY KEY (`username`),
+              `username` varchar(256) NOT NULL,
+              PRIMARY KEY (`authToken`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
             CREATE TABLE IF NOT EXISTS games (
               `id` int NOT NULL AUTO_INCREMENT,
-              `whiteUsername` varchar(256) NOT NULL,
-              `blackUsername` varchar(256) NOT NULL,
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
               `gameName` varchar(256) NOT NULL,
-              `gameData` varchar(256) NOT NULL,
-              PRIMARY KEY (`id`),
+              `gameData` TEXT NOT NULL,
+              PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
@@ -166,7 +167,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Bork");
+            throw new DataAccessException("Bork", ex);
         }
     }
 }
