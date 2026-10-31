@@ -45,7 +45,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("ERROR: " + e.getMessage());
         }
         return 0;
     }
@@ -62,7 +62,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("ERROR: " + e.getMessage());
         }
         return null;
     }
@@ -86,7 +86,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("ERROR: " + e.getMessage());
         }
         return null;
     }
@@ -105,7 +105,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("ERROR: " + e.getMessage());
         }
     }
 
@@ -195,7 +195,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("ERROR: " + e.getMessage());
         }
         return null;
     }
@@ -243,7 +243,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Bork", ex);
+            throw new DataAccessException("ERROR: " + ex.getMessage(), ex);
         }
     }
 }
