@@ -1,8 +1,10 @@
-package dataaccess;
+package dataaccess.sql;
 
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;

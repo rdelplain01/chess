@@ -3,18 +3,15 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.LocalDataAccess;
-import dataaccess.MySqlDataAccess;
+import dataaccess.sql.MySqlDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
-import org.jetbrains.annotations.NotNull;
 import service.Services;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
 public class Server {
 
