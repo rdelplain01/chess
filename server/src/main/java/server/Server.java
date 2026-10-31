@@ -1,12 +1,15 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.LocalDataAccess;
+import dataaccess.MySqlDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
+import org.jetbrains.annotations.NotNull;
 import service.Services;
 
 import java.util.ArrayList;
@@ -16,9 +19,17 @@ import java.util.Objects;
 public class Server {
 
     private final Javalin javalin;
-    private final Services services = new Services(new LocalDataAccess());
+    private final Services services;
 
     public Server() {
+        DataAccess dataAccess;
+        try {
+            dataAccess = new MySqlDataAccess();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        services = new Services(dataAccess);
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         javalin.delete("/db", this::deleteDB);
@@ -28,6 +39,12 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
+        javalin.exception(DataAccessException.class, this::exceptionHandler);
+    }
+
+    private void exceptionHandler(DataAccessException ex, Context ctx) {
+        //String message = ex.getMessage().toLowerCase().contains("error") ? ex.getMessage() : "Error: " + ex.getMessage();
+        throwError(ex.getStatusCode(), ex.getMessage(), ctx);
     }
 
     private void throwError(int code, String message, Context ctx) {
@@ -36,7 +53,7 @@ public class Server {
         ctx.result(new Gson().toJson(result));
     }
 
-    private void register(Context ctx) {
+    private void register(Context ctx) throws DataAccessException {
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
         if (body.get("username") == null || body.get("password") == null || body.get("email") == null) {
@@ -49,27 +66,18 @@ public class Server {
         String email = body.get("email").toString();
         AuthData authData;
 
-        try {
-            authData = services.register(username, password, email);
-        } catch (Exception e) {
-            throwError(403, e.getMessage(), ctx);
-            return;
-        }
+        authData = services.register(username, password, email);
 
         var result = Map.of("username", username, "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
     }
 
-    private void deleteDB(Context ctx) {
+    private void deleteDB(Context ctx) throws DataAccessException {
         // Delete Database
-        try {
-            services.clear();
-        } catch (DataAccessException e) {
-            throwError(500, e.getMessage(), ctx);
-        }
+        services.clear();
     }
 
-    private void login(Context ctx) {
+    private void login(Context ctx) throws DataAccessException {
         // Login
         Map body = new Gson().fromJson(ctx.body(), Map.class);
 
@@ -82,48 +90,33 @@ public class Server {
         String password = body.get("password").toString();
         AuthData authData;
 
-        try {
-            authData = services.login(username, password);
-        } catch (Exception e) {
-            throwError(401, e.getMessage(), ctx);
-            return;
-        }
+        authData = services.login(username, password);
 
         var result = Map.of("username", authData.getUsername(), "authToken", authData.getAuthToken());
         ctx.result(new Gson().toJson(result));
     }
 
-    private void logout(Context ctx) {
+    private void logout(Context ctx) throws DataAccessException {
         // Logout
         String authToken = ctx.header("Authorization");
 
-        try {
-            services.logout(authToken);
-        } catch (Exception e) {
-            throwError(401, e.getMessage(), ctx);
-            return;
-        }
+        services.logout(authToken);
 
         ctx.result("{ }");
     }
 
-    private void listGames(Context ctx) {
+    private void listGames(Context ctx) throws DataAccessException {
         // List Games
         String authToken = ctx.header("Authorization");
         ArrayList<GameData> gameList;
 
-        try {
-            gameList = services.listGames(authToken);
-        } catch (Exception e) {
-            throwError(401, e.getMessage(), ctx);
-            return;
-        }
+        gameList = services.listGames(authToken);
 
         var result = Map.of("games", gameList);
         ctx.result(new Gson().toJson(result));
     }
 
-    private void createGame(Context ctx) {
+    private void createGame(Context ctx) throws DataAccessException {
         // Create Game
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
@@ -136,18 +129,13 @@ public class Server {
         String gameName = body.get("gameName").toString();
         int gameID;
 
-        try {
-            gameID = services.createGame(authToken, gameName);
-        } catch (Exception e) {
-            throwError(401, e.getMessage(), ctx);
-            return;
-        }
+        gameID = services.createGame(authToken, gameName);
 
         var result = Map.of("gameID", gameID);
         ctx.result(new Gson().toJson(result));
     }
 
-    private void joinGame(Context ctx) {
+    private void joinGame(Context ctx) throws DataAccessException {
         // Join Game
         String authToken = ctx.header("Authorization");
         Map body = new Gson().fromJson(ctx.body(), Map.class);
@@ -162,20 +150,7 @@ public class Server {
         String playerColor = body.get("playerColor").toString();
         int gameID = ((Number) body.get("gameID")).intValue();
 
-        try {
-            services.joinGame(authToken, gameID, playerColor);
-        } catch (Exception e) {
-            if (Objects.equals(e.getMessage(), "Error: Player color does not exist")) {
-                throwError(400, e.getMessage(), ctx);
-                return;
-            }
-            if (Objects.equals(e.getMessage(), "Error: game taken")) {
-                throwError(403, e.getMessage(), ctx);
-                return;
-            }
-            throwError(401, e.getMessage(), ctx);
-            return;
-        }
+        services.joinGame(authToken, gameID, playerColor);
 
         ctx.result("{ }");
     }

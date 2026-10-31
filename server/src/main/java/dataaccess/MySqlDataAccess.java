@@ -120,8 +120,16 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
         String statement = "UPDATE games SET whiteUsername=%s, blackUsername=%s, gameData=\"%s\" WHERE id=%d"
-                .formatted(gameData.getWhiteUsername(), gameData.getBlackUsername(), decodeFEN(gameData.getGame()), gameData.getGameID());
+                .formatted(updateString(gameData.getWhiteUsername()), updateString(gameData.getBlackUsername()), decodeFEN(gameData.getGame()), gameData.getGameID());
         update(statement);
+    }
+
+    private String updateString(String s) {
+        if (s == null) {
+            return null;
+        } else {
+            return "\"" + s + "\"";
+        }
     }
 
     private String decodeFEN(ChessGame game) {

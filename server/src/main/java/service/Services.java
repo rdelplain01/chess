@@ -26,7 +26,7 @@ public class Services {
     private AuthData isAuth(String authToken) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(authToken);
         if (authData == null) {
-            throw new DataAccessException("Error: Invalid Permissions");
+            throw new DataAccessException(401, "Error: Invalid Permissions");
         }
         return authData;
     }
@@ -51,7 +51,7 @@ public class Services {
         UserData userData = new UserData(username, hash, email);
 
         if (dataAccess.getUser(username) != null) {
-            throw new DataAccessException("Error: username already taken");
+            throw new DataAccessException(403, "Error: username already taken");
         }
         dataAccess.createUser(userData);
 
@@ -66,11 +66,11 @@ public class Services {
         UserData user = dataAccess.getUser(username);
 
         if (user == null) {
-            throw new DataAccessException("Error: username or password is incorrect");
+            throw new DataAccessException(401, "Error: username or password is incorrect");
         }
 
         if (!verifyPassword(password, user)) {
-            throw new DataAccessException("Error: username or password is incorrect");
+            throw new DataAccessException(401, "Error: username or password is incorrect");
         }
 
         AuthData authData = new AuthData(user.getUsername());
@@ -98,19 +98,21 @@ public class Services {
     public void joinGame(String authToken, int gameID, String playerColor) throws DataAccessException {
         AuthData authData = isAuth(authToken);
         GameData gameData;
-        try {
-            gameData = dataAccess.getGame(gameID);
-        } catch (Exception e) {
-            throw new DataAccessException("Error: Game ID does not exist");
+        gameData = dataAccess.getGame(gameID);
+        if (gameData == null) {
+            throw new DataAccessException(400, "Error: bad request");
+        }
+        if (checkColor(playerColor, gameData)) {
+            throw new DataAccessException(403, "Error: already taken");
         }
 
-        try {
-            if (checkColor(playerColor, gameData)) {
-                throw new DataAccessException("Error: game taken");
-            }
-        } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
-        }
+//        try {
+//            if (checkColor(playerColor, gameData)) {
+//                throw new DataAccessException("Error: game taken");
+//            }
+//        } catch (Exception e) {
+//            throw new DataAccessException(e.getMessage());
+//        }
 
         if (Objects.equals(playerColor, "WHITE")) {
             gameData.setWhiteUsername(authData.getUsername());
