@@ -41,7 +41,7 @@ public class LocalDataAccess implements DataAccess {
     @Override
     public int createGame(String gameName) {
         // create Game
-        GameData game = new GameData(gameName, gameDataList.toArray().length+1);
+        GameData game = new GameData(gameName, gameDataList.toArray().length + 1);
         gameDataList.add(game);
         return game.getGameID();
     }
@@ -49,6 +49,9 @@ public class LocalDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) {
         // get Game
+        if (gameID < 1 || gameID > gameDataList.size()) {
+            return null;
+        }
         return gameDataList.get(gameID - 1);
     }
 

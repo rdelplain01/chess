@@ -41,7 +41,7 @@ public class Services {
         } else if (Objects.equals(playerColor, "BLACK")) {
             return gameData.getBlackUsername() != null;
         }
-        throw new DataAccessException("Error: Player color does not exist");
+        throw new DataAccessException(400, "Error: Player color does not exist");
     }
 
     public AuthData register(String username, String password, String email) throws DataAccessException {
