@@ -118,7 +118,12 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
         String statement = "UPDATE games SET whiteUsername=%s, blackUsername=%s, gameData=\"%s\" WHERE id=%d"
-                .formatted(updateString(gameData.getWhiteUsername()), updateString(gameData.getBlackUsername()), decodeFEN(gameData.getGame()), gameData.getGameID());
+                .formatted(
+                        updateString(gameData.getWhiteUsername()),
+                        updateString(gameData.getBlackUsername()),
+                        decodeFEN(gameData.getGame()),
+                        gameData.getGameID()
+                );
         update(statement);
     }
 
@@ -132,15 +137,15 @@ public class MySqlDataAccess implements DataAccess {
 
     private String decodeFEN(ChessGame game) {
         ChessBoard board = game.getBoard();
-        StringBuilder FEN = new StringBuilder();
+        StringBuilder fen = new StringBuilder();
         int space = 0;
         boolean first = true;
         for (int i = 8; i > 0; i--) {
             if (space > 0) {
-                FEN.append(space);
+                fen.append(space);
             }
             if (!first) {
-                FEN.append('/');
+                fen.append('/');
             }
             first = false;
             space = 0;
@@ -149,9 +154,9 @@ public class MySqlDataAccess implements DataAccess {
                     space++;
                 } else {
                     if (space > 0) {
-                        FEN.append("/");
-                        FEN.append(space);
-                        FEN.append("/");
+                        fen.append("/");
+                        fen.append(space);
+                        fen.append("/");
                         space = 0;
                     }
                     Character piece;
@@ -166,11 +171,11 @@ public class MySqlDataAccess implements DataAccess {
                     if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == ChessGame.TeamColor.BLACK) {
                         piece = Character.toLowerCase(piece);
                     }
-                    FEN.append(piece);
+                    fen.append(piece);
                 }
             }
         }
-        return FEN.toString();
+        return fen.toString();
     }
 
     @Override
