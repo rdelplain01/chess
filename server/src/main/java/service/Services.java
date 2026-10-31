@@ -106,14 +106,6 @@ public class Services {
             throw new DataAccessException(403, "Error: already taken");
         }
 
-//        try {
-//            if (checkColor(playerColor, gameData)) {
-//                throw new DataAccessException("Error: game taken");
-//            }
-//        } catch (Exception e) {
-//            throw new DataAccessException(e.getMessage());
-//        }
-
         if (Objects.equals(playerColor, "WHITE")) {
             gameData.setWhiteUsername(authData.getUsername());
         } else if (Objects.equals(playerColor, "BLACK")) {

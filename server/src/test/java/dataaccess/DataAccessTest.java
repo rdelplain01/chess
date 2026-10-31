@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,11 +48,18 @@ class DataAccessTest {
         assertNotNull(dataAccess.listGames());
     }
 
-//    @Test
-//    void updateGame() throws DataAccessException {
-//        int id = dataAccess.createGame("test");
-//        dataAccess.updateGame(dataAccess.getGame(id));
-//    }
+    @Test
+    void updateGame() throws DataAccessException {
+        int id = dataAccess.createGame("test");
+        GameData game = dataAccess.getGame(id);
+        game.setWhiteUsername("whitePlayer");
+
+        dataAccess.updateGame(game);
+
+        GameData updated = dataAccess.getGame(id);
+        assertEquals("whitePlayer", updated.getWhiteUsername());
+        assertNull(updated.getBlackUsername());
+    }
 
     @Test
     void createAuthAndGet() throws DataAccessException {

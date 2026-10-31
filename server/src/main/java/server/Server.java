@@ -43,7 +43,6 @@ public class Server {
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx) {
-        //String message = ex.getMessage().toLowerCase().contains("error") ? ex.getMessage() : "Error: " + ex.getMessage();
         throwError(ex.getStatusCode(), ex.getMessage(), ctx);
     }
 
