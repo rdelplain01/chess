@@ -176,6 +176,12 @@ public class MySqlDataAccess implements DataAccess {
                     fen.append(piece);
                 }
             }
+            fen.append(' ');
+            if (game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                fen.append('w');
+            } else {
+                fen.append('b');
+            }
         }
         return fen.toString();
     }

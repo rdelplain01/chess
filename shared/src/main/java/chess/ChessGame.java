@@ -299,6 +299,50 @@ public class ChessGame {
         return board;
     }
 
+    public void fenBoard(String fen) {
+        ChessGame.TeamColor color;
+        ChessPiece.PieceType type = ChessPiece.PieceType.PAWN;
+        int i = 8;
+        int j = 1;
+        boolean breakFor = false;
+        for (int g = 0; g < fen.length(); g++) {
+            char place = fen.charAt(g);
+            switch (Character.toUpperCase(place)) {
+                case 'R' -> type = ChessPiece.PieceType.ROOK;
+                case 'N' -> type = ChessPiece.PieceType.KNIGHT;
+                case 'B' -> type = ChessPiece.PieceType.BISHOP;
+                case 'K' -> type = ChessPiece.PieceType.KING;
+                case 'Q' -> type = ChessPiece.PieceType.QUEEN;
+                case 'P' -> type = ChessPiece.PieceType.PAWN;
+                case '/' -> {
+                    i--;
+                    j = 1;
+                    continue;
+                }
+                case ' ' -> breakFor = true;
+                default -> {
+                    j += Character.getNumericValue(place);
+                    continue;
+                }
+            }
+            if (breakFor) {
+                if (fen.charAt(g + 1) == 'w') {
+                    turn = TeamColor.WHITE;
+                    break;
+                }
+                turn = TeamColor.BLACK;
+                break;
+            }
+            if (Character.isUpperCase(place)) {
+                color = ChessGame.TeamColor.WHITE;
+            } else {
+                color = ChessGame.TeamColor.BLACK;
+            }
+            board.addPiece(new ChessPosition(i, j), new ChessPiece(color, type));
+            j++;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
