@@ -19,7 +19,6 @@ public class Repl {
     // Padded characters.
     private static final String EMPTY = "   ";
 
-
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             mainLoop:
@@ -29,7 +28,8 @@ public class Repl {
                 String[] command = input.split(" ");
                 switch (command[0]) {
                     case "register": {
-                        displayBoard(scanner);
+                        var color = ChessGame.TeamColor.WHITE;
+                        displayBoard(scanner, color);
                     }
                     case "login": {
                     }
@@ -50,14 +50,14 @@ public class Repl {
         }
     }
 
-    private static void displayBoard(Scanner scanner) {
+    private static void displayBoard(Scanner scanner, ChessGame.TeamColor color) {
         ChessGame game = new ChessGame();
 
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
-        printChessBoard(out, game);
+        printChessBoard(out, game, color);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -85,7 +85,6 @@ public class Repl {
     }
 
     private static void printPlayer(PrintStream out, String player) {
-//        out.print(SET_BG_COLOR_BLUE);
         out.print(SET_TEXT_COLOR_BLACK);
 
         out.print(" ");
@@ -138,47 +137,74 @@ public class Repl {
         }
     }
 
-    private static void printChessBoard(PrintStream out, ChessGame game) {
+    private static void printChessBoard(PrintStream out, ChessGame game, ChessGame.TeamColor color) {
         List<String> letters = List.of(new String[]{"a", "b", "c", "d", "e", "f", "g", "h"});
+        List<String> revLetters = List.of(new String[]{"h", "g", "f", "e", "d", "c", "g", "h"});
 
         // Header
         setBlue(out);
         out.print(EMPTY.repeat(1));
 
-        for (var letter : letters) {
-            printPlayer(out, letter);
+        boolean red = (color == ChessGame.TeamColor.WHITE);
+        if (red) {
+            for (var letter : letters) {
+                printPlayer(out, letter);
+            }
+
+            setBlue(out);
+            out.print(EMPTY.repeat(1));
+            setBlack(out);
+            out.println();
+
+            for (int i = BOARD_SIZE_IN_SQUARES; i > 0; i--) {
+                printLines(out, red, i, game);
+                red = !red;
+            }
+
+            setBlue(out);
+            out.print(EMPTY.repeat(1));
+
+            for (var letter : letters) {
+                printPlayer(out, letter);
+            }
+        } else {
+            for (var letter : revLetters) {
+                printPlayer(out, letter);
+            }
+
+            setBlue(out);
+            out.print(EMPTY.repeat(1));
+            setBlack(out);
+            out.println();
+
+            for (int i = 1; i < BOARD_SIZE_IN_SQUARES + 1; i++) {
+                printLines(out, red, i, game);
+                red = !red;
+            }
+
+            setBlue(out);
+            out.print(EMPTY.repeat(1));
+
+            for (var letter : revLetters) {
+                printPlayer(out, letter);
+            }
         }
 
         setBlue(out);
         out.print(EMPTY.repeat(1));
         setBlack(out);
         out.println();
+    }
 
-        boolean red = true;
-        for (int i = BOARD_SIZE_IN_SQUARES; i > 0; i--) {
-            setBlue(out);
-            printPlayer(out, "%d".formatted(i));
+    private static void printLines(PrintStream out, boolean red, int i, ChessGame game) {
+        setBlue(out);
+        printPlayer(out, "%d".formatted(i));
 
-            printCross(out, red, i, game);
-
-            setBlue(out);
-            printPlayer(out, "%d".formatted(i));
-
-            setBlack(out);
-            out.println();
-
-            red = !red;
-        }
+        printCross(out, red, i, game);
 
         setBlue(out);
-        out.print(EMPTY.repeat(1));
+        printPlayer(out, "%d".formatted(i));
 
-        for (var letter : letters) {
-            printPlayer(out, letter);
-        }
-
-        setBlue(out);
-        out.print(EMPTY.repeat(1));
         setBlack(out);
         out.println();
     }
