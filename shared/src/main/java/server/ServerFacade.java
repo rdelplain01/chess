@@ -22,10 +22,6 @@ public class ServerFacade {
     }
 
     public AuthData register(UserData user) {
-//        Gson gson = new Gson();
-//        var registerRequest = gson.toJson("{\"username\":\"%s\", \"password\":\"%s\", \"email\":\"%s\"}"
-//                .formatted(username, password, email));
-
         // Register
         var request = buildRequest("POST", "/user", user);
         var response = sendRequest(request);
@@ -36,8 +32,11 @@ public class ServerFacade {
         // Delete Database
     }
 
-    public void login() {
+    public AuthData login(Map<String, String> loginRequest) {
         // Login
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout() {

@@ -10,6 +10,7 @@ import server.ServerFacade;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -22,8 +23,10 @@ public class Repl {
     // Padded characters.
     private static final String EMPTY = "   ";
 
+    private static ServerFacade serverFacade;
+
     public static void main(String[] args) {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade = new ServerFacade("http://localhost:8080");
         try (Scanner scanner = new Scanner(System.in)) {
             mainLoop:
             while (true) {
@@ -34,15 +37,22 @@ public class Repl {
                     case "register": {
                         UserData user = new UserData(command[1], command[2], command[3]);
                         AuthData authData = serverFacade.register(user);
-                        System.out.println(authData);
-//                        if (authData != null) {
-//                            postLoginUI();
-//                        }
-                        // Test
-//                        var color = ChessGame.TeamColor.WHITE;
-//                        displayBoard(scanner, color);
+                        if (authData != null) {
+                            postLoginUI();
+                        }
+                        break;
                     }
                     case "login": {
+                        Map<String, String> loginRequest = Map.of(
+                                "username", command[1],
+                                "password", command[2]
+                        );
+                        AuthData authData = serverFacade.login(loginRequest);
+                        if (authData != null) {
+                            System.out.printf("Welcome %s!\n", authData.getUsername());
+                            postLoginUI();
+                        }
+                        break;
                     }
                     case "quit": {
                         break mainLoop;
@@ -54,6 +64,46 @@ public class Repl {
                                 quit - playing chess
                                 help - with commands
                                 """);
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+
+    private static void postLoginUI() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            postLoginLoop:
+            while (true) {
+                System.out.print("Enter your command: ");
+                String input = scanner.nextLine();
+                String[] command = input.split(" ");
+                switch (command[0]) {
+                    case "logout": {
+                        //
+                    }
+                    case "create": {
+                        //
+                    }
+                    case "list": {
+                        //
+                    }
+                    case "join": {
+//                        var color = ChessGame.TeamColor.WHITE;
+//                        displayBoard(scanner, color);
+                    }
+                    case "quit": {
+                        break postLoginLoop;
+                    }
+                    case "help": {
+                        System.out.println("""
+                                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                                login <USERNAME> <PASSWORD> - to play chess
+                                quit - playing chess
+                                help - with commands
+                                """);
+                        break;
                     }
                 }
             }
