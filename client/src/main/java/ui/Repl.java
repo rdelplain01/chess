@@ -3,6 +3,9 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
+import model.AuthData;
+import model.UserData;
+import server.ServerFacade;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +23,7 @@ public class Repl {
     private static final String EMPTY = "   ";
 
     public static void main(String[] args) {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         try (Scanner scanner = new Scanner(System.in)) {
             mainLoop:
             while (true) {
@@ -28,8 +32,15 @@ public class Repl {
                 String[] command = input.split(" ");
                 switch (command[0]) {
                     case "register": {
-                        var color = ChessGame.TeamColor.WHITE;
-                        displayBoard(scanner, color);
+                        UserData user = new UserData(command[1], command[2], command[3]);
+                        AuthData authData = serverFacade.register(user);
+                        System.out.println(authData);
+//                        if (authData != null) {
+//                            postLoginUI();
+//                        }
+                        // Test
+//                        var color = ChessGame.TeamColor.WHITE;
+//                        displayBoard(scanner, color);
                     }
                     case "login": {
                     }
@@ -48,6 +59,13 @@ public class Repl {
             }
 
         }
+    }
+
+
+    private void playGame() {
+        ChessBoard board = new ChessBoard();
+
+        // Do stuff
     }
 
     private static void displayBoard(Scanner scanner, ChessGame.TeamColor color) {

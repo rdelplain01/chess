@@ -21,38 +21,38 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    private AuthData register(UserData user) {
+    public AuthData register(UserData user) {
 //        Gson gson = new Gson();
 //        var registerRequest = gson.toJson("{\"username\":\"%s\", \"password\":\"%s\", \"email\":\"%s\"}"
 //                .formatted(username, password, email));
 
         // Register
-        var request = buildRequest("POST", "/register", user);
+        var request = buildRequest("POST", "/user", user);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
-    private void deleteDB() {
+    public void deleteDB() {
         // Delete Database
     }
 
-    private void login() {
+    public void login() {
         // Login
     }
 
-    private void logout() {
+    public void logout() {
         // Logout
     }
 
-    private void listGames() {
+    public void listGames() {
         // List Games
     }
 
-    private void createGame() {
+    public void createGame() {
         // Create Game
     }
 
-    private void joinGame() {
+    public void joinGame() {
         // Join Game
     }
 
