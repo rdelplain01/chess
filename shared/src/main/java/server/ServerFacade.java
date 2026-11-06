@@ -3,14 +3,12 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
-import model.GameData;
 import model.UserData;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class ServerFacade {
@@ -39,8 +37,11 @@ public class ServerFacade {
         return handleResponse(response, AuthData.class);
     }
 
-    public void logout() {
+    public Map logout(AuthData authData) {
         // Logout
+        var request = buildRequestAuth("DELETE", "/session", authData, null);
+        var response = sendRequest(request);
+        return handleResponse(response, Map.class);
     }
 
     public void listGames() {
@@ -58,6 +59,17 @@ public class ServerFacade {
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
+                .method(method, makeRequestBody(body));
+        if (body != null) {
+            request.setHeader("Content-Type", "application/json");
+        }
+        return request.build();
+    }
+
+    private HttpRequest buildRequestAuth(String method, String path, AuthData authData, Object body) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .header("Authorization", authData.getAuthToken())
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");

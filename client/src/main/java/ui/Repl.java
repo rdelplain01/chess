@@ -38,7 +38,7 @@ public class Repl {
                         UserData user = new UserData(command[1], command[2], command[3]);
                         AuthData authData = serverFacade.register(user);
                         if (authData != null) {
-                            postLoginUI();
+                            postLoginUI(authData);
                         }
                         break;
                     }
@@ -50,7 +50,7 @@ public class Repl {
                         AuthData authData = serverFacade.login(loginRequest);
                         if (authData != null) {
                             System.out.printf("Welcome %s!\n", authData.getUsername());
-                            postLoginUI();
+                            postLoginUI(authData);
                         }
                         break;
                     }
@@ -72,42 +72,48 @@ public class Repl {
         }
     }
 
-    private static void postLoginUI() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            postLoginLoop:
-            while (true) {
-                System.out.print("Enter your command: ");
-                String input = scanner.nextLine();
-                String[] command = input.split(" ");
-                switch (command[0]) {
-                    case "logout": {
-                        //
-                    }
-                    case "create": {
-                        //
-                    }
-                    case "list": {
-                        //
-                    }
-                    case "join": {
+    private static void postLoginUI(AuthData authData) {
+        Scanner scanner = new Scanner(System.in);
+        postLoginLoop:
+        while (true) {
+            System.out.print("Enter your command: ");
+            String input = scanner.nextLine();
+            String[] command = input.split(" ");
+            switch (command[0]) {
+                case "logout": {
+                    Map s = serverFacade.logout(authData);
+                    System.out.println(s);
+                    break postLoginLoop;
+                }
+                case "create": {
+                    //
+                    break;
+                }
+                case "list": {
+                    //
+                    break;
+                }
+                case "join": {
 //                        var color = ChessGame.TeamColor.WHITE;
 //                        displayBoard(scanner, color);
-                    }
-                    case "quit": {
-                        break postLoginLoop;
-                    }
-                    case "help": {
-                        System.out.println("""
-                                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                                login <USERNAME> <PASSWORD> - to play chess
-                                quit - playing chess
-                                help - with commands
-                                """);
-                        break;
-                    }
+                    break;
+                }
+                case "quit": {
+                    break postLoginLoop;
+                }
+                case "help": {
+                    System.out.println("""
+                            create <NAME> - a game
+                            list - games
+                            join <ID> <WHITE|BLACK> - a game
+                            observe <ID> - a game
+                            logout - when you are done
+                            quit - playing chess
+                            help - with commands
+                            """);
+                    break;
                 }
             }
-
         }
     }
 
