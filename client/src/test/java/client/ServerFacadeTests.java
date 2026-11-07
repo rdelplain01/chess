@@ -6,6 +6,8 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import java.util.Map;
+
 
 public class ServerFacadeTests {
 
@@ -31,11 +33,29 @@ public class ServerFacadeTests {
         client.deleteDB();
     }
 
+    private UserData registerDummyUser() {
+        UserData user = new UserData("test", "testPass", "test@mail.com");
+        client.register(user);
+        return user;
+    }
+
     @Test
     public void simpleRegister() {
         UserData user = new UserData("test", "testPass", "test@mail.com");
         Assertions.assertDoesNotThrow(() -> {
             client.register(user);
+        });
+    }
+
+    @Test
+    public void simpleLogin() {
+        UserData user = registerDummyUser();
+        Map<String, String> loginRequest = Map.of(
+                "username", user.getUsername(),
+                "password", user.getPassword()
+        );
+        Assertions.assertDoesNotThrow(() -> {
+            client.login(loginRequest);
         });
     }
 
