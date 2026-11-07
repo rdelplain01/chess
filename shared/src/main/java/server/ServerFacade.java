@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 import java.util.Map;
 
 public class ServerFacade {
@@ -46,8 +47,11 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
-    public void listGames(AuthData authData) {
+    public Collection listGames(AuthData authData) {
         // List Games
+        var request = buildRequestAuth("GET", "/game", authData, null);
+        var response = sendRequest(request);
+        return handleResponse(response, Collection.class);
     }
 
     public int createGame(AuthData authData, String gameName) {
