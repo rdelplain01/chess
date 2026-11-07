@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import server.ServerFacade;
 
@@ -86,7 +87,8 @@ public class Repl {
                     break postLoginLoop;
                 }
                 case "create": {
-                    //
+                    int gameID = serverFacade.createGame(authData, command[1]);
+                    System.out.println(gameID);
                     break;
                 }
                 case "list": {

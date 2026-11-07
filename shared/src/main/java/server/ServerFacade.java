@@ -1,8 +1,10 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.net.URI;
@@ -44,12 +46,15 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
-    public void listGames() {
+    public void listGames(AuthData authData) {
         // List Games
     }
 
-    public void createGame() {
+    public int createGame(AuthData authData, String gameName) {
         // Create Game
+        var request = buildRequestAuth("POST", "/game", authData, gameName);
+        var response = sendRequest(request);
+        return handleResponse(response, Integer.class);
     }
 
     public void joinGame() {
