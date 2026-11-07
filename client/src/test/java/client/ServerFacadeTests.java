@@ -1,4 +1,4 @@
-package java.client;
+package client;
 
 import client.ChessClient;
 import model.UserData;
@@ -26,12 +26,17 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    public void delete() {
+        client.deleteDB();
+    }
 
     @Test
     public void simpleRegister() {
-        UserData user = new UserData("test", "testpass", "test@mail.com");
-        client.register(user);
-        Assertions.assertTrue(true);
+        UserData user = new UserData("test", "testPass", "test@mail.com");
+        Assertions.assertDoesNotThrow(() -> {
+            client.register(user);
+        });
     }
 
 }

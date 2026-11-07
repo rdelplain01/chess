@@ -29,8 +29,11 @@ public class ServerFacade {
         return handleResponse(response, AuthData.class);
     }
 
-    public void deleteDB() {
+    public Map deleteDB() {
         // Delete Database
+        var request = buildRequest("DELETE", "/db", null);
+        var response = sendRequest(request);
+        return handleResponse(response, Map.class);
     }
 
     public AuthData login(Map<String, String> loginRequest) {
