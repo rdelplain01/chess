@@ -54,11 +54,11 @@ public class ServerFacade {
         return handleResponse(response, Collection.class);
     }
 
-    public int createGame(AuthData authData, String gameName) {
+    public Map createGame(AuthData authData, String gameName) {
         // Create Game
-        var request = buildRequestAuth("POST", "/game", authData, gameName);
+        var request = buildRequestAuth("POST", "/game", authData, Map.of("gameName", gameName));
         var response = sendRequest(request);
-        return handleResponse(response, Integer.class);
+        return handleResponse(response, Map.class);
     }
 
     public void joinGame() {

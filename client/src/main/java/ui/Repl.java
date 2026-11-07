@@ -4,15 +4,12 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import model.AuthData;
-import model.GameData;
 import model.UserData;
 import server.ServerFacade;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -26,8 +23,8 @@ public class Repl {
 
     private static ServerFacade serverFacade;
 
-    public static void main(String[] args) {
-        serverFacade = new ServerFacade("http://localhost:8080");
+    public void run(String url) {
+        serverFacade = new ServerFacade(url);
         try (Scanner scanner = new Scanner(System.in)) {
             mainLoop:
             while (true) {
@@ -87,12 +84,13 @@ public class Repl {
                     break postLoginLoop;
                 }
                 case "create": {
-                    int gameID = serverFacade.createGame(authData, command[1]);
+                    Map gameID = serverFacade.createGame(authData, command[1]);
                     System.out.println(gameID);
                     break;
                 }
                 case "list": {
-                    //
+                    Collection gameList = serverFacade.listGames(authData);
+                    System.out.println(gameList);
                     break;
                 }
                 case "join": {
