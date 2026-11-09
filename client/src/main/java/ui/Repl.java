@@ -81,7 +81,7 @@ public class Repl {
             switch (command[0]) {
                 case "logout": {
                     Map s = serverFacade.logout(authData);
-                    System.out.println(s);
+                    System.out.println("logged out");
                     break postLoginLoop;
                 }
                 case "create": {
@@ -97,10 +97,8 @@ public class Repl {
                     break;
                 }
                 case "join": {
-                    Map game = serverFacade.joinGame(authData, command[1], Integer.parseInt(command[2]));
-                    System.out.println(game);
-//                        var color = ChessGame.TeamColor.WHITE;
-//                        displayBoard(scanner, color);
+                    ChessGame game = serverFacade.joinGame(authData, command[2], Integer.parseInt(command[1]));
+                    playGame(scanner, game, command[2]);
                     break;
                 }
                 case "quit": {
@@ -123,15 +121,18 @@ public class Repl {
     }
 
 
-    private void playGame() {
-        ChessBoard board = new ChessBoard();
+    private static void playGame(Scanner scanner, ChessGame game, String color) {
+        if (Objects.equals(color, "WHITE")) {
+            displayBoard(game, ChessGame.TeamColor.WHITE);
+        } else {
+            displayBoard(game, ChessGame.TeamColor.BLACK);
+        }
 
-        // Do stuff
+        System.out.print("What is your move: ");
+        String input = scanner.nextLine();
     }
 
-    private static void displayBoard(Scanner scanner, ChessGame.TeamColor color) {
-        ChessGame game = new ChessGame();
-
+    private static void displayBoard(ChessGame game, ChessGame.TeamColor color) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -141,6 +142,8 @@ public class Repl {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
 
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private static void setWhite(PrintStream out) {

@@ -67,14 +67,14 @@ public class ServerFacade {
         return body.get("gameID").getAsInt();
     }
 
-    public Map joinGame(AuthData authData, String playerColor, int gameID) {
+    public ChessGame joinGame(AuthData authData, String playerColor, int gameID) {
         // Join Game
         var request = buildRequestAuth("PUT", "/game", authData, Map.of(
                 "playerColor", playerColor,
                 "gameID", gameID
         ));
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        return handleResponse(response, ChessGame.class);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
