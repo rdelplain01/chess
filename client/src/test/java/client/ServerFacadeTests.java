@@ -1,6 +1,7 @@
 package client;
 
 import client.ChessClient;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -59,4 +60,43 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void simpleLogout() {
+        UserData user = registerDummyUser();
+        Map<String, String> loginRequest = Map.of(
+                "username", user.getUsername(),
+                "password", user.getPassword()
+        );
+        AuthData auth = client.login(loginRequest);
+        Assertions.assertDoesNotThrow(() -> {
+            client.logout(auth);
+        });
+    }
+
+    @Test
+    public void simpleCreate() {
+        UserData user = registerDummyUser();
+        Map<String, String> loginRequest = Map.of(
+                "username", user.getUsername(),
+                "password", user.getPassword()
+        );
+        AuthData auth = client.login(loginRequest);
+        Assertions.assertDoesNotThrow(() -> {
+            client.createGame(auth, "test");
+        });
+    }
+
+    @Test
+    public void simpleList() {
+        UserData user = registerDummyUser();
+        Map<String, String> loginRequest = Map.of(
+                "username", user.getUsername(),
+                "password", user.getPassword()
+        );
+        AuthData auth = client.login(loginRequest);
+        client.createGame(auth, "test");
+        Assertions.assertDoesNotThrow(() -> {
+            client.listGames(auth);
+        });
+    }
 }
