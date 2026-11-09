@@ -89,7 +89,7 @@ public class Repl {
                     break;
                 }
                 case "list": {
-                    Collection gameList = serverFacade.listGames(authData);
+                    Map gameList = serverFacade.listGames(authData);
                     System.out.println(gameList);
                     break;
                 }

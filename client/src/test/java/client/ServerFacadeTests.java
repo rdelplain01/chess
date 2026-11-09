@@ -99,4 +99,18 @@ public class ServerFacadeTests {
             client.listGames(auth);
         });
     }
+
+    @Test
+    public void simpleJoin() {
+        UserData user = registerDummyUser();
+        Map<String, String> loginRequest = Map.of(
+                "username", user.getUsername(),
+                "password", user.getPassword()
+        );
+        AuthData auth = client.login(loginRequest);
+        client.createGame(auth, "test");
+        Assertions.assertDoesNotThrow(() -> {
+            client.joinGame(auth, "WHITE", 1);
+        });
+    }
 }

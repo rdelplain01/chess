@@ -50,11 +50,11 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
-    public Collection listGames(AuthData authData) {
+    public Map listGames(AuthData authData) {
         // List Games
         var request = buildRequestAuth("GET", "/game", authData, null);
         var response = sendRequest(request);
-        return handleResponse(response, Collection.class);
+        return handleResponse(response, Map.class);
     }
 
     public Map createGame(AuthData authData, String gameName) {
@@ -64,8 +64,14 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
-    public void joinGame() {
+    public Map joinGame(AuthData authData, String playerColor, int gameID) {
         // Join Game
+        var request = buildRequestAuth("PUT", "/game", authData, Map.of(
+                "playerColor", playerColor,
+                "gameID", gameID
+        ));
+        var response = sendRequest(request);
+        return handleResponse(response, Map.class);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
