@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -50,11 +51,12 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
-    public Map listGames(AuthData authData) {
+    public GameData[] listGames(AuthData authData) {
         // List Games
         var request = buildRequestAuth("GET", "/game", authData, null);
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        JsonObject body = handleResponse(response, JsonObject.class);
+        return new Gson().fromJson(body.get("games"), GameData[].class);
     }
 
     public Map createGame(AuthData authData, String gameName) {

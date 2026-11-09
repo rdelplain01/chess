@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import server.ServerFacade;
 
@@ -89,11 +90,15 @@ public class Repl {
                     break;
                 }
                 case "list": {
-                    Map gameList = serverFacade.listGames(authData);
-                    System.out.println(gameList);
+                    GameData[] gameList = serverFacade.listGames(authData);
+                    for (var game : gameList) {
+                        System.out.printf("ID: %d    Name: %s \n", game.getGameID(), game.getGameName());
+                    }
                     break;
                 }
                 case "join": {
+                    Map game = serverFacade.joinGame(authData, command[1], Integer.parseInt(command[2]));
+                    System.out.println(game);
 //                        var color = ChessGame.TeamColor.WHITE;
 //                        displayBoard(scanner, color);
                     break;

@@ -19,6 +19,10 @@ public class GameData {
         return gameID;
     }
 
+    public String getGameName() {
+        return gameName;
+    }
+
     public String getBlackUsername() {
         return blackUsername;
     }
