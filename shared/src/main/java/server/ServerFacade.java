@@ -59,11 +59,12 @@ public class ServerFacade {
         return new Gson().fromJson(body.get("games"), GameData[].class);
     }
 
-    public Map createGame(AuthData authData, String gameName) {
+    public int createGame(AuthData authData, String gameName) {
         // Create Game
         var request = buildRequestAuth("POST", "/game", authData, Map.of("gameName", gameName));
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        JsonObject body = handleResponse(response, JsonObject.class);
+        return body.get("gameID").getAsInt();
     }
 
     public Map joinGame(AuthData authData, String playerColor, int gameID) {

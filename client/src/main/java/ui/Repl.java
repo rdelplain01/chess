@@ -85,8 +85,8 @@ public class Repl {
                     break postLoginLoop;
                 }
                 case "create": {
-                    Map gameID = serverFacade.createGame(authData, command[1]);
-                    System.out.println(gameID);
+                    int gameID = serverFacade.createGame(authData, command[1]);
+                    System.out.printf("ID: %d    Name: %s \n", gameID, command[1]);
                     break;
                 }
                 case "list": {
