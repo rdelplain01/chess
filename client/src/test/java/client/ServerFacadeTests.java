@@ -1,11 +1,9 @@
 package client;
 
-import client.ChessClient;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import server.ServerFacade;
 
 import java.util.Map;
 
