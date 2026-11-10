@@ -32,39 +32,60 @@ public class Repl {
                 System.out.print("Enter your command: ");
                 String input = scanner.nextLine();
                 String[] command = input.split(" ");
-                switch (command[0]) {
-                    case "register": {
-                        UserData user = new UserData(command[1], command[2], command[3]);
-                        AuthData authData = serverFacade.register(user);
-                        if (authData != null) {
-                            postLoginUI(authData);
+                try {
+                    switch (command[0]) {
+                        case "register": {
+                            if (!hasArgs(command, 4)) {
+                                break;
+                            }
+                            UserData user = new UserData(command[1], command[2], command[3]);
+                            AuthData authData = serverFacade.register(user);
+                            if (authData != null) {
+                                postLoginUI(authData);
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case "login": {
-                        Map<String, String> loginRequest = Map.of(
-                                "username", command[1],
-                                "password", command[2]
-                        );
-                        AuthData authData = serverFacade.login(loginRequest);
-                        if (authData != null) {
-                            System.out.printf("Welcome %s!\n", authData.getUsername());
-                            postLoginUI(authData);
+                        case "login": {
+                            if (!hasArgs(command, 3)) {
+                                break;
+                            }
+                            Map<String, String> loginRequest = Map.of(
+                                    "username", command[1],
+                                    "password", command[2]
+                            );
+                            AuthData authData = serverFacade.login(loginRequest);
+                            if (authData != null) {
+                                System.out.printf("Welcome %s!\n", authData.getUsername());
+                                postLoginUI(authData);
+                            }
+                            break;
                         }
-                        break;
+                        case "quit": {
+                            break mainLoop;
+                        }
+                        case "help": {
+                            System.out.println("""
+                                    register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                                    login <USERNAME> <PASSWORD> - to play chess
+                                    quit - playing chess
+                                    help - with commands
+                                    """);
+                            break;
+                        }
+                        default: {
+                            System.out.println("""
+                                    Unknown command. Here are the available commands:
+                                    
+                                    register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                                    login <USERNAME> <PASSWORD> - to play chess
+                                    quit - playing chess
+                                    help - with commands
+                                    """);
+                            break;
+                        }
                     }
-                    case "quit": {
-                        break mainLoop;
-                    }
-                    case "help": {
-                        System.out.println("""
-                                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                                login <USERNAME> <PASSWORD> - to play chess
-                                quit - playing chess
-                                help - with commands
-                                """);
-                        break;
-                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
             }
 
@@ -85,6 +106,9 @@ public class Repl {
                     break postLoginLoop;
                 }
                 case "create": {
+                    if (!hasArgs(command, 2)) {
+                        break;
+                    }
                     int gameID = serverFacade.createGame(authData, command[1]);
                     System.out.printf("ID: %d    Name: %s \n", gameID, command[1]);
                     break;
@@ -97,13 +121,21 @@ public class Repl {
                     break;
                 }
                 case "join": {
+                    if (!hasArgs(command, 3)) {
+                        break;
+                    }
                     ChessGame game = serverFacade.joinGame(authData, command[2], Integer.parseInt(command[1]));
                     playGame(scanner, game, command[2]);
                     break;
                 }
-                case "quit": {
-                    break postLoginLoop;
+                case "observe": {
+                    ChessGame game = serverFacade.joinGame(authData, null, Integer.parseInt(command[1]));
+                    playGame(scanner, game, null);
+                    break;
                 }
+//                case "quit": {
+//                    break postLoginLoop;
+//                }
                 case "help": {
                     System.out.println("""
                             create <NAME> - a game
@@ -111,25 +143,53 @@ public class Repl {
                             join <ID> <WHITE|BLACK> - a game
                             observe <ID> - a game
                             logout - when you are done
-                            quit - playing chess
                             help - with commands
                             """);
+                    break;
+                }
+                default: {
+                    help();
                     break;
                 }
             }
         }
     }
 
+    private static boolean hasArgs(String[] command, int count) {
+        if (command.length < count) {
+            help();
+            return false;
+        }
+        return true;
+    }
+
+    private static void help() {
+        System.out.println("""
+                Unknown command. Here are the available commands:
+                
+                create <NAME> - a game
+                list - games
+                join <ID> <WHITE|BLACK> - a game
+                observe <ID> - a game
+                logout - when you are done
+                help - with commands
+                """);
+    }
+
 
     private static void playGame(Scanner scanner, ChessGame game, String color) {
         if (Objects.equals(color, "WHITE")) {
             displayBoard(game, ChessGame.TeamColor.WHITE);
-        } else {
+        } else if (Objects.equals(color, "BLACK")) {
             displayBoard(game, ChessGame.TeamColor.BLACK);
+        } else {
+            displayBoard(game, ChessGame.TeamColor.WHITE);
         }
 
-        System.out.print("What is your move: ");
-        String input = scanner.nextLine();
+        if (color != null) {
+            System.out.print("What is your move: ");
+            String input = scanner.nextLine();
+        }
     }
 
     private static void displayBoard(ChessGame game, ChessGame.TeamColor color) {
