@@ -34,57 +34,45 @@ public class Repl {
                 String[] command = input.split(" ");
                 try {
                     switch (command[0]) {
-                        case "register": {
-                            if (command.length < 4) {
-                                helpPre();
-                                break;
-                            }
-                            UserData user = new UserData(command[1], command[2], command[3]);
-                            AuthData authData = serverFacade.register(user);
-                            if (authData != null) {
-                                System.out.printf("Welcome %s!\n", authData.getUsername());
-                                postLoginUI(authData);
-                            }
-                            break;
-                        }
-                        case "login": {
-                            if (command.length < 3) {
-                                helpPre();
-                                break;
-                            }
-                            Map<String, String> loginRequest = Map.of(
-                                    "username", command[1],
-                                    "password", command[2]
-                            );
-                            AuthData authData = serverFacade.login(loginRequest);
-                            if (authData != null) {
-                                System.out.printf("Welcome %s!\n", authData.getUsername());
-                                postLoginUI(authData);
-                            }
-                            break;
-                        }
-                        case "quit": {
+                        case "register" -> register(command, scanner);
+                        case "login" -> login(command, scanner);
+                        case "quit" -> {
                             break mainLoop;
                         }
-                        case "help": {
-                            System.out.println("""
-                                    register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                                    login <USERNAME> <PASSWORD> - to play chess
-                                    quit - playing chess
-                                    help - with commands
-                                    """);
-                            break;
-                        }
-                        default: {
-                            helpPre();
-                            break;
-                        }
+                        case "help" -> helpPre(false);
+                        default -> helpPre(true);
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             }
 
+        }
+    }
+
+    private static void register(String[] command, Scanner scanner) {
+        if (command.length < 4) {
+            helpPre(true);
+            return;
+        }
+        AuthData authData = serverFacade.register(new UserData(command[1], command[2], command[3]));
+        System.out.printf("Welcome %s!%n", authData.getUsername());
+        postLoginUI(authData);
+    }
+
+    private static void login(String[] command, Scanner scanner) {
+        if (command.length < 3) {
+            helpPre(true);
+            return;
+        }
+        Map<String, String> loginRequest = Map.of(
+                "username", command[1],
+                "password", command[2]
+        );
+        AuthData authData = serverFacade.login(loginRequest);
+        if (authData != null) {
+            System.out.printf("Welcome %s!\n", authData.getUsername());
+            postLoginUI(authData);
         }
     }
 
@@ -97,63 +85,16 @@ public class Repl {
             String[] command = input.split(" ");
             try {
                 switch (command[0]) {
-                    case "logout": {
-                        serverFacade.logout(authData);
-                        System.out.println("logged out");
+                    case "logout" -> {
+                        logout(authData);
                         break postLoginLoop;
                     }
-                    case "create": {
-                        if (command.length < 2) {
-                            helpPost();
-                            break;
-                        }
-                        int gameID = serverFacade.createGame(authData, command[1]);
-                        System.out.printf("ID: %d    Name: %s \n", gameID, command[1]);
-                        break;
-                    }
-                    case "list": {
-                        GameData[] gameList = serverFacade.listGames(authData);
-                        for (var game : gameList) {
-                            System.out.printf("ID: %d    Name: %s \n", game.getGameID(), game.getGameName());
-                            System.out.printf("\tWHITE: %s\n",
-                                    (game.getWhiteUsername() == null) ? "none" : game.getWhiteUsername());
-                            System.out.printf("\tBLACK: %s\n",
-                                    (game.getBlackUsername() == null) ? "none" : game.getBlackUsername());
-                        }
-                        break;
-                    }
-                    case "join": {
-                        if (command.length < 3) {
-                            helpPost();
-                            break;
-                        }
-                        ChessGame game = serverFacade.joinGame(authData, command[2], Integer.parseInt(command[1]));
-                        playGame(scanner, game, command[2]);
-                        break;
-                    }
-                    case "observe": {
-                        if (command.length < 2) {
-                            helpPost();
-                            break;
-                        }
-                        playGame(scanner, new ChessGame(), null);
-                        break;
-                    }
-                    case "help": {
-                        System.out.println("""
-                                create <NAME> - a game
-                                list - games
-                                join <ID> <WHITE|BLACK> - a game
-                                observe <ID> - a game
-                                logout - when you are done
-                                help - with commands
-                                """);
-                        break;
-                    }
-                    default: {
-                        helpPost();
-                        break;
-                    }
+                    case "create" -> create(command, authData);
+                    case "list" -> listGames(authData);
+                    case "join" -> joinGame(command, authData, scanner);
+                    case "observe" -> observeGame(command, authData, scanner);
+                    case "help" -> helpPost(false);
+                    default -> helpPost(true);
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -161,10 +102,54 @@ public class Repl {
         }
     }
 
-    private static void helpPre() {
+    private static void logout(AuthData authData) {
+        serverFacade.logout(authData);
+        System.out.println("logged out");
+    }
+
+    private static void create(String[] command, AuthData authData) {
+        if (command.length < 2) {
+            helpPost(true);
+            return;
+        }
+        int gameID = serverFacade.createGame(authData, command[1]);
+        System.out.printf("ID: %d    Name: %s \n", gameID, command[1]);
+    }
+
+    private static void listGames(AuthData authData) {
+        GameData[] gameList = serverFacade.listGames(authData);
+        for (var game : gameList) {
+            System.out.printf("ID: %d    Name: %s \n", game.getGameID(), game.getGameName());
+            System.out.printf("\tWHITE: %s\n",
+                    (game.getWhiteUsername() == null) ? "none" : game.getWhiteUsername());
+            System.out.printf("\tBLACK: %s\n",
+                    (game.getBlackUsername() == null) ? "none" : game.getBlackUsername());
+        }
+    }
+
+    private static void joinGame(String[] command, AuthData authData, Scanner scanner) {
+        if (command.length < 3) {
+            helpPost(true);
+            return;
+        }
+        ChessGame game = serverFacade.joinGame(authData, command[2], Integer.parseInt(command[1]));
+        playGame(scanner, game, command[2]);
+    }
+
+    private static void observeGame(String[] command, AuthData authData, Scanner scanner) {
+        if (command.length < 2) {
+            helpPost(true);
+            return;
+        }
+        playGame(scanner, new ChessGame(), null);
+    }
+
+
+    private static void helpPre(boolean unknown) {
+        if (unknown) {
+            System.out.println("Unknown command. Here are the available commands:");
+        }
         System.out.println("""
-                Unknown command. Here are the available commands:
-                
                 register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                 login <USERNAME> <PASSWORD> - to play chess
                 quit - playing chess
@@ -172,10 +157,11 @@ public class Repl {
                 """);
     }
 
-    private static void helpPost() {
+    private static void helpPost(boolean unknown) {
+        if (unknown) {
+            System.out.println("Unknown command. Here are the available commands:");
+        }
         System.out.println("""
-                Unknown command. Here are the available commands:
-                
                 create <NAME> - a game
                 list - games
                 join <ID> <WHITE|BLACK> - a game
@@ -270,7 +256,7 @@ public class Repl {
         ChessBoard board = game.getBoard();
         int col = 1;
         for (int i = 0; i < BOARD_SIZE_IN_SQUARES / 2; i++) {
-            if (red) {
+            if (!red) {
                 setRed(out);
                 drawSquare(out, board, row, col);
                 col++;
