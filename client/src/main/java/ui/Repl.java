@@ -27,8 +27,8 @@ public class Repl {
     public void run(String url) {
         serverFacade = new ServerFacade(url);
         try (Scanner scanner = new Scanner(System.in)) {
-            mainLoop:
-            while (true) {
+            boolean running = true;
+            while (running) {
                 System.out.print("Enter your command: ");
                 String input = scanner.nextLine();
                 String[] command = input.split(" ");
@@ -36,9 +36,7 @@ public class Repl {
                     switch (command[0]) {
                         case "register" -> register(command, scanner);
                         case "login" -> login(command, scanner);
-                        case "quit" -> {
-                            break mainLoop;
-                        }
+                        case "quit" -> running = false;
                         case "help" -> helpPre(false);
                         default -> helpPre(true);
                     }
